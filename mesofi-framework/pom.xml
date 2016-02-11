@@ -1,0 +1,146 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>mx.com.mesofi</groupId>
+		<artifactId>mesofi-apps</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>mesofi-framework</artifactId>
+	<packaging>jar</packaging>
+
+	<properties>
+		<final-name>mesofi-framework</final-name>
+
+		<org.springframework.version>3.2.3.RELEASE</org.springframework.version>
+		<org.hibernate.version>4.1.5.Final</org.hibernate.version>
+		<mesofi-commons.version>1.0-SNAPSHOT</mesofi-commons.version>
+		<commons-dbcp.version>1.4</commons-dbcp.version>
+		<velocity.version>1.7</velocity.version>
+		<jackson.version>1.9.13</jackson.version>
+		<mail.version>1.4</mail.version>
+	</properties>
+
+	<dependencies>
+		<!-- Application Context (depends on spring-core, spring-expression, spring-aop, 
+			spring-beans) This is the central artifact for Spring's Dependency Injection 
+			Container and is generally always defined -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<!-- Web application development utilities applicable to both Servlet and 
+			Portlet Environments (depends on spring-core, spring-beans, spring-context) 
+			Define this if you use Spring MVC, or wish to use Struts, JSF, or another 
+			web framework with Spring (org.springframework.web.*) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<!-- JDBC Data Access Library (depends on spring-core, spring-beans, spring-context, 
+			spring-tx) Define this if you use Spring's JdbcTemplate API (org.springframework.jdbc.*) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<!-- Support for testing Spring applications with tools such as JUnit and 
+			TestNG This artifact is generally always defined with a 'test' scope for 
+			the integration testing framework and unit testing stubs -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework.version}</version>
+			<!--scope>test</scope-->
+		</dependency>
+		
+		<!-- Various Application Context utilities, including EhCache, JavaMail, 
+			Quartz, and Freemarker integration. -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${org.springframework.version}</version>  
+        </dependency>
+        
+        <!-- Integration with ORM. -->
+        <dependency>
+        	<groupId>org.springframework</groupId>
+        	<artifactId>spring-orm</artifactId>
+        	<version>${org.springframework.version}</version>
+        	<!-- will come with all needed Spring dependencies such as spring-core and spring-beans-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${org.hibernate.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>4.2.0.Final</version>
+        </dependency>
+
+		<!-- This library is meant to use only for local environments, for others 
+			environments, this dependency should be removed -->
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>${commons-dbcp.version}</version>
+		</dependency>
+
+		<!-- This library is meant to use for all the mesofi's projects, that's 
+			why this dependency is located at this level, when some project uses the 
+			mesofi's framewrok, this common utilities goes inside -->
+		<dependency>
+			<groupId>mx.com.mesofi</groupId>
+			<artifactId>mesofi-commons</artifactId>
+			<version>${mesofi-commons.version}</version>
+		</dependency>
+		
+		<!-- This dependency is meant to use to transform from objects to json format. -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		
+		<!-- This library is meant to use for using velocity in queries -->
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>${velocity.version}</version>
+		</dependency>
+		
+		<!-- This library is meant to be used for sending email -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>${mail.version}</version>
+		</dependency>
+            
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>springsource-repo</id>
+			<name>SpringSource Repository</name>
+			<url>http://repo.springsource.org/release</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+
+		</plugins>
+		<finalName>${final-name}</finalName>
+	</build>
+</project>
