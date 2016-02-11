@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<util:properties id="configuratorAppDao">
+		<prop key="select.all.code.sections">
+			<![CDATA[
+			    SELECT DISTINCT POINT_CUT_NAME FROM MSF_TEMPLATE_CODE ORDER BY POINT_CUT_NAME
+			]]>
+		</prop>
+		<prop key="select.all.available.types">
+		    <![CDATA[
+			    SELECT ID, JAVA_TYPE FROM MSF_ADMIN_COLUMN_TYPES WHERE EFFECTIVE_TYPE = 1 ORDER BY JAVA_TYPE
+			]]>
+		</prop>
+		<prop key="select.types.by.database">
+		    <![CDATA[
+		        SELECT 
+		            MACT.ID, MACT.DATABASE_TYPE, MACT.ID_SQL_TYPE, MACT.SQL_TYPE, MACT.JAVA_TYPE, MACT.EFFECTIVE_TYPE 
+		        FROM 
+		            MSF_ADMIN_COLUMN_TYPES MACT
+		        WHERE
+		            MACT.ID_DATABASE_TYPE = ?
+		        ORDER BY
+		            MACT.DATABASE_TYPE
+		    ]]>
+		</prop>
+		<prop key="select.all.database.names">
+			<![CDATA[
+			    SELECT DISTINCT ID_DATABASE_TYPE FROM MSF_ADMIN_COLUMN_TYPES
+			]]>
+		</prop>
+		<prop key="update.all.java.database.types">
+			<![CDATA[
+			    UPDATE MSF_ADMIN_COLUMN_TYPES SET JAVA_TYPE = ?, EFFECTIVE_TYPE = ? WHERE ID = ?
+			]]>
+		</prop>
+		<prop key="select.all.pointcut.names">
+			<![CDATA[
+			    SELECT DISTINCT POINT_CUT_NAME FROM MSF_TEMPLATE_CODE 
+			]]>
+		</prop>
+		<prop key="select.like.pointcut.names">
+			<![CDATA[
+			    WHERE POINT_CUT_NAME LIKE ? 
+			]]>
+		</prop>
+		<prop key="select.order.pointcut.names">
+			<![CDATA[
+			    ORDER BY POINT_CUT_NAME 
+			]]>
+		</prop>
+		<prop key="insert.all.custom.code">
+			<![CDATA[
+			    INSERT INTO MSF_TEMPLATE_CODE (POINT_CUT_NAME, CODE) VALUES (?, ?)
+			]]>
+		</prop>
+		<prop key="update.all.custom.code">
+			<![CDATA[
+			    UPDATE MSF_TEMPLATE_CODE SET CODE = ? WHERE ID = ?
+			]]>
+		</prop>
+		<prop key="select.custom.code.by.section">
+			<![CDATA[
+				SELECT ID, CODE FROM MSF_TEMPLATE_CODE WHERE POINT_CUT_NAME = ? ORDER BY ID
+			]]>
+		</prop>
+		<prop key="select.types.by.section">
+		    <![CDATA[
+		        SELECT MACT.ID, MACT.ID_CODE, MACT.ID_COLUMN_TYPE AS ID_TYPE
+		        FROM MSF_ALL_CODE_TYPE MACT
+		        WHERE MACT.ID_CODE IN (SELECT ID FROM MSF_TEMPLATE_CODE WHERE POINT_CUT_NAME = ?)
+		    ]]>
+		</prop>
+		<prop key="delete.relation.code.type">
+		    <![CDATA[
+		        DELETE FROM MSF_ALL_CODE_TYPE WHERE ID = ?
+		    ]]>
+		</prop>
+		<prop key="create.relation.code.type">
+		    <![CDATA[
+		        INSERT INTO MSF_ALL_CODE_TYPE(ID_CODE, ID_COLUMN_TYPE) VALUES (?, ?)
+		    ]]>
+		</prop>
+	</util:properties>
+</beans>

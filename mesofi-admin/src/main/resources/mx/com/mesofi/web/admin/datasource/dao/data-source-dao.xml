@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<util:properties id="dataSourceDao">
+		<prop key="insert.connection">
+			<![CDATA[
+				INSERT INTO MSF_ADMIN_CONNECTIONS (ID_DATABASE_TYPE, CONN_NAME, USER_NAME, PASSWORD, HOST, PORT, DATABASE_NAME, SERVICE, URL) 
+				VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+			]]>
+		</prop>
+		<prop key="update.connection">
+			<![CDATA[
+				UPDATE MSF_ADMIN_CONNECTIONS 
+				SET ID_DATABASE_TYPE = ?, CONN_NAME = ?, USER_NAME = ?, PASSWORD = ?, HOST = ?, PORT = ?, DATABASE_NAME = ?, SERVICE = ?, URL = ?
+				WHERE ID = ?
+			]]>
+		</prop>
+		<prop key="delete.connection">
+			<![CDATA[
+				DELETE FROM MSF_ADMIN_CONNECTIONS WHERE ID = ?
+			]]>
+		</prop>
+		<prop key="select.all.connections">
+			<![CDATA[
+				SELECT ID, CONN_NAME, ID_DATABASE_TYPE FROM MSF_ADMIN_CONNECTIONS ORDER BY CONN_NAME 
+			]]>
+		</prop>
+		<prop key="select.connection">
+			<![CDATA[
+				SELECT CONN_NAME, ID_DATABASE_TYPE, DATABASE_NAME, USER_NAME, PASSWORD, URL, PORT, HOST, SERVICE 
+				FROM MSF_ADMIN_CONNECTIONS 
+				WHERE ID = ? 
+			]]>
+		</prop>
+		<prop key="select.connection.table.column.values">
+			<![CDATA[
+			    SELECT SUBSTRING(COLUMN_TYPE,5) AS ENUM_VALUES
+			    FROM information_schema.COLUMNS
+			    WHERE TABLE_SCHEMA = ?
+			    AND TABLE_NAME = ?
+			    AND COLUMN_NAME = ?
+			]]>
+		</prop>
+	</util:properties>
+
+</beans>

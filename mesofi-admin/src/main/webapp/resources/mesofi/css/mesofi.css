@@ -1,0 +1,63 @@
+.modal-dialog-configure-application {
+	width: 1100px;
+}
+.modal-dialog-preview-code {
+	width: 1100px;	
+}
+.modal-dialog-config-types {
+	width: 1000px;	
+}
+.modal-dialog-config-code {
+	width: 1000px;	
+}
+.modal-dialog-java-types {
+	width: 700px;	
+}
+.CodeMirror-scroll {
+  height: auto;
+  verflow: visible
+}
+.input-append .btn.dropdown-menu {
+    float: none;
+}
+.modal-header {
+	color: #428bca;
+}
+
+.bootbox-body {
+	font-size: xx-small;
+	height: 100px
+}
+
+label.valid {
+	width: 24px;
+	height: 24px;
+	background: url(../img/valid.png) center center no-repeat;
+	display: inline-block;
+	text-indent: -9999px;
+}
+
+label.error {
+	font-weight: bold;
+	color: red;
+	padding: 2px 8px;
+	margin-top: 2px;
+}
+
+.label-error {
+	color: #b94a48;
+	padding: 2px 8px;
+	margin-top: 2px;
+}
+
+.input-block-level {
+	width: 86%;
+}
+
+.wait-cursor { 
+	cursor: wait; 
+}
+
+.container {
+	width: 100%;
+}

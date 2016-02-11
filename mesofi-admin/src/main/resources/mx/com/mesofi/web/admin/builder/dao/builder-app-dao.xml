@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<util:properties id="builderAppDao">
+		<prop key="insert.table.configuration">
+			<![CDATA[
+				INSERT INTO MSF_ADMIN_TABLES (ID_CONNECTION, IS_DATABASE_SCHEMA, DATABASE_SCHEMA, TABLE_NAME) 
+				VALUES(?, ?, ?, ?)
+			]]>
+		</prop>
+		<prop key="insert.column.configuration">
+			<![CDATA[
+				INSERT INTO MSF_ADMIN_COLUMNS (ID_TABLE, PRIMARY_KEY, FOREIGN_KEY, REF_ID_TABLE, COLUMN_NAME, ID_COLUMN_TYPE, PERMITTED_VALUES, SIZE, SCALE, NULLABLE, AUTO_INCREMENT) 
+				VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			]]>
+		</prop>
+		<prop key="update.table.configuration.processed">
+			<![CDATA[
+				UPDATE MSF_ADMIN_TABLES 
+				SET IS_TABLE_NAME_PROCESSED = ?
+				WHERE ID = ?
+			]]>
+		</prop>
+		<prop key="count.single.configuration">
+			<![CDATA[
+				SELECT 
+					COUNT(D.ID) 
+				FROM 
+					MSF_ADMIN_CONNECTIONS D, MSF_ADMIN_TABLES T, MSF_ADMIN_COLUMNS C
+				WHERE
+					T.ID_CONNECTION = D.ID
+					AND C.ID_TABLE = T.ID
+					AND D.ID = ?
+					AND T.DATABASE_SCHEMA = ?
+					AND T.TABLE_NAME = ?
+			]]>
+		</prop>
+		<prop key="select.all.configuration.summary">
+			<![CDATA[
+				SELECT ID, TABLE_NAME FROM MSF_ADMIN_TABLES
+			]]>
+		</prop>
+		<prop key="select.all.configuration.detail">
+			<![CDATA[
+				SELECT CC.CONN_NAME, T.TABLE_NAME, C.COLUMN_NAME, CT.DATABASE_TYPE, C.PERMITTED_VALUES, C.SIZE, C.SCALE, C.NULLABLE, C.PRIMARY_KEY, C.AUTO_INCREMENT, CT.ID_SQL_TYPE, CT.JAVA_TYPE 
+				FROM MSF_ADMIN_TABLES T, MSF_ADMIN_COLUMNS C, MSF_ADMIN_CONNECTIONS CC, MSF_ADMIN_COLUMN_TYPES CT 
+				WHERE C.ID_TABLE = T.ID 
+				AND T.ID_CONNECTION = CC.ID 
+				AND C.ID_COLUMN_TYPE = CT.ID
+				AND T.IS_TABLE_NAME_PROCESSED = 1
+			]]>
+		</prop>
+		<prop key="select.all.configuration.detail.by.conn">
+			<![CDATA[
+				SELECT DISTINCT(T.DATABASE_SCHEMA) 
+				FROM MSF_ADMIN_TABLES T 
+				WHERE T.ID_CONNECTION = ?
+				ORDER BY T.DATABASE_SCHEMA
+			]]>
+		</prop>
+		<prop key="select.all.configuration.detail.by.conn-database">
+			<![CDATA[
+				SELECT T.ID, T.TABLE_NAME 
+				FROM MSF_ADMIN_TABLES T 
+				WHERE T.ID_CONNECTION = ?
+				AND T.DATABASE_SCHEMA = ?
+				ORDER BY T.TABLE_NAME
+			]]>
+		</prop>
+		<prop key="select.mapping.types.by.database">
+			<![CDATA[
+				SELECT * FROM MSF_ADMIN_COLUMN_TYPES WHERE ID_DATABASE_TYPE = ?
+			]]>
+		</prop>
+		<prop key="insert.mapping.configuration">
+			<![CDATA[
+				INSERT INTO MSF_ADMIN_COLUMN_TYPES (ID_DATABASE_TYPE, DATABASE_TYPE, ID_SQL_TYPE, SQL_TYPE, EFFECTIVE_TYPE) VALUES (?, ?, ?, ?, ?)
+			]]>
+		</prop>
+		<prop key="select.mapping.code.types">
+		    <![CDATA[
+		        SELECT CT.ID, C.ID AS ID_CODE, C.POINT_CUT_NAME, C.CODE, T.ID AS ID_TYPE, T.JAVA_TYPE
+		        FROM MSF_ALL_CODE_TYPE CT, MSF_TEMPLATE_CODE C, MSF_ADMIN_COLUMN_TYPES T  
+		        WHERE CT.ID_CODE = C.ID
+		        AND CT.ID_COLUMN_TYPE = T.ID
+			 ]]>
+		</prop>
+		<prop key="select.mapping.code.types.by.pointcut">
+		    <![CDATA[
+		        AND POINT_CUT_NAME = ?
+			 ]]>
+		</prop>
+		<prop key="select.mapping.code.types.orderby">
+		    <![CDATA[
+		        ORDER BY POINT_CUT_NAME, ID_CODE, ID
+			 ]]>
+		</prop>
+		<prop key="select.plugin.config.all">
+		    <![CDATA[
+		        SELECT P.ID, P.TITLE, P.DESCRIPTION, P.PRE_SELECTED
+		        FROM MSF_ADMIN_PLUGIN P  
+		        ORDER BY ORDER_SHOWN
+		    ]]>
+		</prop>
+		<prop key="select.plugin.config.single">
+		    <![CDATA[
+		        SELECT P.CLASS_IMPLEMENTATION
+		        FROM MSF_ADMIN_PLUGIN P
+		        WHERE P.ID = ?
+		    ]]>
+		</prop>
+		<prop key="select.pref.config.all">
+		    <![CDATA[
+		        SELECT P.PROPERTY_NAME, P.PROPERTY_VALUE
+		        FROM MSF_ADMIN_PREFERENCES P
+		    ]]>
+		</prop>
+	</util:properties>
+
+</beans>

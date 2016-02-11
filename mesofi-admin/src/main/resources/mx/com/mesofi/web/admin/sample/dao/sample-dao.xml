@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<util:properties id="sqlSampleDao">
+		<prop key="insert.company">
+			<![CDATA[
+				INSERT INTO COMPANY(NAME) VALUES (?)
+			]]>
+		</prop>
+		<prop key="insert.employee">
+			<![CDATA[
+				INSERT INTO EMPLOYEE(ID_COMPANY, USER_NAME, FULL_NAME, AGE) VALUES (?,?,?,?)
+			]]>
+		</prop>
+		<prop key="select.company.tree">
+			<![CDATA[
+				SELECT C.ID AS ID_COMP, C.NAME AS NAME_COMP, E.ID AS ID_EMP, 
+					E.USER_NAME AS USER_NAME, 
+					E.FULL_NAME AS FULL_NAME, 
+					E.AGE AS AGE  
+				FROM
+					COMPANY C, EMPLOYEE E 
+				WHERE 
+					C.ID = E.ID_COMPANY
+					#if ( $retrieveSingle )
+						AND C.ID = ?
+					#end
+			]]>
+		</prop>
+		<prop key="delete.ref.company">
+			<![CDATA[
+				DELETE FROM COMPANY WHERE ID = ?
+			]]>
+		</prop>
+		<prop key="delete.ref.employee">
+			<![CDATA[
+				DELETE FROM EMPLOYEE WHERE ID_COMPANY = ?
+			]]>
+		</prop>
+		<prop key="update.company">
+			<![CDATA[
+				UPDATE COMPANY SET NAME = ? WHERE ID = ?
+			]]>
+		</prop>
+	</util:properties>
+
+</beans>

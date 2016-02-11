@@ -1,0 +1,2 @@
+-- By clicking in either install-artifacts.bat or install-artifacts.sh, will install missing libraries in classpath
+--  

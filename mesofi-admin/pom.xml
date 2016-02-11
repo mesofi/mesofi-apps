@@ -1,0 +1,232 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>mx.com.mesofi</groupId>
+        <artifactId>mesofi-apps</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <groupId>mx.com.mesofi.web</groupId>
+    <artifactId>mesofi-admin</artifactId>
+    <packaging>war</packaging>
+
+    <organization>
+        <name>${organization.name}</name>
+        <url>${organization.url}</url>
+    </organization>
+    <name>${project.artifactId}</name>
+    <url>${organization.url}</url>
+
+    <developers>
+        <developer>
+            <name>Armando Rivas</name>
+            <email>armando.rivas@mesofi.com.mx</email>
+            <organization>${organization.name}</organization>
+            <organizationUrl>${organization.url}</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <properties>
+        <context.path>mesofi-admin</context.path>
+
+        <mesofi-web.version>1.0-SNAPSHOT</mesofi-web.version>
+        <mesofi-plugin-version>1.0-SNAPSHOT</mesofi-plugin-version>
+        <maven-war-plugin.version>2.0.2</maven-war-plugin.version>
+        <derbyclient.version>10.10.1.1</derbyclient.version>
+        <hsqldb.version>2.2.4</hsqldb.version>
+        <mysql.version>5.1.27</mysql.version>
+        <oracle.version>0.1</oracle.version>
+        <sqlserver.version>0.1</sqlserver.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>mx.com.mesofi</groupId>
+            <artifactId>mesofi-web</artifactId>
+            <version>${mesofi-web.version}</version>
+        </dependency>
+        
+        <!-- Dependency that includes Primefaces,SpringCore,SpringJdbc -->
+        <!-- 
+        <dependency>
+        	<groupId>mx.com.mesofi</groupId>
+        	<artifactId>mesofi-plugin-perseus</artifactId>
+        	<version>${mesofi-plugin-version}</version>
+        </dependency>
+        -->
+        
+        <!-- Dependency that includes Primefaces,SpringCore,Hibernate -->
+         
+        <dependency>
+        	<groupId>mx.com.mesofi</groupId>
+        	<artifactId>mesofi-plugin-orion</artifactId>
+        	<version>${mesofi-plugin-version}</version>
+        </dependency>
+        
+        
+        <!--  Dependency that includes Spring MVC,SpringCore,Hibernate -->
+        
+        <dependency>
+        	<groupId>mx.com.mesofi</groupId>
+        	<artifactId>mesofi-plugin-andromeda</artifactId>
+        	<version>${mesofi-plugin-version}</version>
+        </dependency>
+        
+    </dependencies>
+
+    <profiles>
+        <!-- defines the properties for the different environments -->
+        <!-- this properties applies over preferences.properties -->
+        <!-- [from the command line: "mvn clean install or mvn clean install -P 
+        test" or "mvn clean install -P prod"] -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <current.environment>Development phase</current.environment>
+                <env.spring.profile>dev</env.spring.profile>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derbyclient</artifactId>
+                    <version>${derbyclient.version}</version>
+                </dependency>
+                <!-- Default database when Derby is not configured -->
+                <dependency>
+                    <groupId>org.hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>${hsqldb.version}</version>
+                </dependency>
+                <!-- Development -->
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>${mysql.version}</version>
+                </dependency>
+                <!-- Third Party drivers -->
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc14</artifactId>
+                    <version>${oracle.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sqlserver</groupId>
+                    <artifactId>sqljdbc4</artifactId>
+                    <version>${sqlserver.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <resources>
+                    <!-- We tell the plugin where the resources are located and that filtering 
+                    must be switched on. -->
+                    <resource>
+                        <filtering>true</filtering>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <current.environment>Quality phase</current.environment>
+                <env.spring.profile>test</env.spring.profile>
+            </properties>
+            <build>
+                <resources>
+                    <!-- We tell the plugin where the resources are located and that filtering 
+                    must be switched on. -->
+                    <resource>
+                        <filtering>true</filtering>
+                        <directory>src/main/resources</directory>
+                        <excludes>
+                            <exclude>**/*preferences.properties</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <current.environment>Production phase</current.environment>
+                <env.spring.profile>prod</env.spring.profile>
+            </properties>
+            <build>
+                <resources>
+                    <!-- We tell the plugin where the resources are located and that filtering 
+                    must be switched on. -->
+                    <resource>
+                        <filtering>true</filtering>
+                        <directory>src/main/resources</directory>
+                        <excludes>
+                            <exclude>**/*preferences.properties</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+                <plugins>
+                    <!-- plugin to enable javadoc generator for the production profile -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <!-- Plugin for filtering -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <configuration>
+                    <!-- specify UTF-8, ISO-8859-1 or any other file encoding -->
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <!-- plugin for filtering resources on webapp resources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven-war-plugin.version}</version>
+                <!-- UNCOMMENT THIS SECTION WHEN CREATING THE FINAL WAR -->
+                <!-- 
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>src/main/webapp/WEB-INF</directory>
+                            <targetPath>WEB-INF</targetPath>
+                            <includes>
+                                <include>web.xml</include>
+                                 include any other file types you want to filter 
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+                 -->
+            </plugin>
+        </plugins>
+        <finalName>${context.path}</finalName>
+    </build>
+</project>
