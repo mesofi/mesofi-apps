@@ -1,0 +1,89 @@
+#set ($classNameModelInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+
+package ${packageName}.${suffixPackageName};
+
+import java.io.Serializable;
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import ${packageName}.${suffixModelPackageName}.${classNameModel};
+
+import org.apache.log4j.Logger;
+
+import org.primefaces.model.menu.DefaultMenuItem;
+import org.primefaces.model.menu.DefaultMenuModel;
+import org.primefaces.model.menu.DefaultSubMenu;
+import org.primefaces.model.menu.MenuModel;
+import org.primefaces.model.menu.Submenu;
+
+/**
+ *
+ * @author Mesofi
+ * @since ${date}
+ */
+@ManagedBean
+@SessionScoped
+public class ${className} implements Serializable {
+
+    /**
+     * log4j.
+     */
+    private static final Logger log = Logger.getLogger(${className}.class);
+
+    private ${classNameModel} ${classNameModelInstance};
+
+    private MenuModel menuModel;
+
+    /**
+     * This method is call once this bean is fully initialized. This means, all
+     * the dependencies are injected and its constructor has been executed.
+     * Because this method is annotated with @PostConstruct, then will be
+     * invoked only once.
+     */
+    @PostConstruct
+    public void init() {
+        ${classNameModelInstance} = new ${classNameModel}();
+        menuModel = new DefaultMenuModel();
+    }
+
+    public String loginUsuario() {
+        // creates the elements for the menu.
+        createMainMenu();
+        return "success";
+    }
+
+    public ${classNameModel} get${classNameModel}() {
+        return ${classNameModelInstance};
+    }
+
+    public MenuModel getMenuModel() {
+        return menuModel;
+    }
+
+    private void createMainMenu() {
+        if (log.isDebugEnabled()) {
+            log.debug("Creating main menu ...");
+        }
+        menuModel.getElements().clear();
+        
+        Submenu mainMenu = new DefaultSubMenu("Catalogs");
+
+#foreach( ${screen} in ${screens} )
+        DefaultMenuItem menuItem${velocityCount} = new DefaultMenuItem("${screen.screenName}");
+        menuItem${velocityCount}.setUrl("/catalogs/${screen.pageName}.jsf");
+        mainMenu.getElements().add(menuItem${velocityCount});
+        
+#end
+        menuModel.addElement(mainMenu);
+    }
+}

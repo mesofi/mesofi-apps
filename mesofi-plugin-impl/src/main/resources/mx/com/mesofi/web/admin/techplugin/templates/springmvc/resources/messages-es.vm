@@ -1,0 +1,57 @@
+# This file contains all the messages for the application organized by module.
+
+login.page.title=${projectName}
+
+login.form.title=Reg\u00edstrese
+login.form.field.username=Nombre de Usuario
+login.form.field.password=Contrase\u00f1a
+login.form.button.login=Acceder
+
+# Some error messages.
+error.system.default=Hubo un error inesperado en el sistema.
+error.system.title=Error de Sistema.
+        
+# General labels for buttons and stuff.
+
+catalog.menu.msg.catalog=Cat\u00e1logos
+catalog.menu.msg.home=Inicio
+catalog.menu.msg.config=Configuraci\u00f3n
+catalog.menu.msg.logout=Salir
+
+catalog.filter.msg.header=Criterio de Busqueda
+catalog.table.msg.nofound=No se encontraron registros
+catalog.table.msg.loading=Cargando...
+
+catalog.form.button.reset=Limpiar
+catalog.form.button.search=Buscar
+catalog.form.button.add=Agregar
+catalog.form.button.refresh=Refrescar
+catalog.form.button.edit=Editar
+catalog.form.button.cancel=Cancelar
+catalog.form.button.save=Guardar
+catalog.form.button.update=Actualizar
+catalog.form.button.empty=Seleccione una opci\u00f3n
+
+catalog.form.title.edit=Editar Registro
+catalog.form.title.new=Nuevo Registro
+
+catalog.form.msg.new=Un nuevo registro se ha creado!!
+catalog.form.msg.updated=Este registro se ha actualizado correctamente!!
+catalog.form.msg.title.new=Nuevo Registro
+catalog.form.msg.title.updated=Registro Actualizado
+
+catalog.form.validation.required=El campo '?' es requerido
+catalog.form.validation.maxlength=La longitud para este campo '?' es mas de <len>
+catalog.form.validation.scale=El numero de digitos de fraccion para este campo '?' es mas de <scale>
+
+catalog.form.format.date=dd/MM/yyyy
+catalog.form.format.datetime=dd/MM/yyyy HH:mm:ss
+catalog.form.format.time=HH:mm:ss
+
+#foreach( ${field} in ${allFields} )
+# Labels for page ${field.pageName}.
+#foreach( ${f} in ${field.appFields} )
+catalog.${field.pageName}.field.${f.fieldLabel.replace(" ","")}=${f.fieldLabel.substring(0,1).toUpperCase()}${f.fieldLabel.substring(1)}
+#end
+
+#end

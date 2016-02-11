@@ -1,0 +1,32 @@
+#
+# Log4J Settings for log4j 1.2.x (via jakarta-commons-logging)
+#
+# The five logging levels used by Log are (in order):
+#
+#   1. DEBUG (the least serious)
+#   2. INFO
+#   3. WARN
+#   4. ERROR
+#   5. FATAL (the most serious)
+
+
+# Set root logger level to WARN and append to STDOUT
+log4j.rootLogger=INFO, STDOUT, FILE
+
+log4j.appender.STDOUT=org.apache.log4j.ConsoleAppender
+log4j.appender.STDOUT.layout=org.apache.log4j.PatternLayout
+log4j.appender.STDOUT.layout.ConversionPattern=%d %5p (%c:%L) - %m%n
+
+log4j.appender.FILE=org.apache.log4j.RollingFileAppender
+log4j.appender.FILE.File=./${projectName}.log
+log4j.appender.FILE.Append=true
+log4j.appender.FILE.MaxFileSize=10240KB
+log4j.appender.FILE.MaxBackupIndex=10
+log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.FILE.layout.ConversionPattern=%d %5p (%c:%L) - %m%n
+
+# Print only messages of level ERROR or above in the package noModule.
+# log4j.logger.noModule=FATAL
+
+# Application Stuff
+log4j.logger.${packageName}=DEBUG

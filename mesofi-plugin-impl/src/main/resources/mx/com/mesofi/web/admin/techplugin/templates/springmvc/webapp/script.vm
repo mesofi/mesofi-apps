@@ -1,0 +1,188 @@
+/* Script used for this application */
+$(document).ready(function () {
+    /**
+     * Retrieves all the records of the current page.
+     */
+    $.fn.searchRecords = function () {
+        $.fn.searchRecordsRequest('GET', 'search');
+    };
+    /**
+     * Resets the form.
+     */
+    $(function () {
+        $('#clearBtn').click(function (e) {
+            $('#formSearch')[0].reset();
+            $.fn.searchRecords();
+        });
+    });
+    /**
+     * Filter the records of the current page.
+     */
+    $(function () {
+        $('#filterBtn').click(function (e) {
+            var form = $('#formSearch');
+            $.fn.searchRecordsRequest(form.attr('method'), form.attr('action'), form.serialize());
+        });
+    });
+    /**
+     * Saves or updates the current record.
+     */
+    $(function () {
+        $('#saveOrUpdateBtn').click(function (e) {
+            var selectorForm = '#formDialog';
+            var formDialog = $(selectorForm);
+            $.ajax({
+                type: formDialog.attr('method'),
+                url: formDialog.attr('action'),
+                dataType: 'json',
+                data: formDialog.serialize()
+            }).done(function (info) {
+                if (info.code === 0) {
+                    $('#modalDialog').modal('hide'); // hides the dialog
+                    
+                    var formSearch = $('#formSearch');
+                    $.fn.searchRecordsRequest(formSearch.attr('method'), formSearch.attr('action'), formSearch.serialize());
+                } else if (info.code === 300) {
+                    // validate the form
+                    $.fn.initForm(formDialog, false);
+                    var templateTooltip = '<div class="popover"><div class="arrow"></div><div class="popover-inner"><div class="popover-content"><p></p></div></div></div>';
+                    $.each(info.data, function (fieldName, obj) {
+                        $(selectorForm + " input[name='" + fieldName + "']").popover({template: templateTooltip, content: obj, trigger: 'hover'}).popover('show');
+                        $(selectorForm + " input[name='" + fieldName + "']").closest('.form-group').addClass('has-error');
+                    });
+                } else {
+                    $.fn.showSystemError(info);
+                }
+            }).fail(function (info) {
+                $.fn.showSystemErrorFault(info);
+            });
+        });
+    });
+    /**
+     * Add new records.
+     */
+    $('#modalDialog').on('show.bs.modal', function (event) {
+        var target = $(event.relatedTarget); // Button or component that triggered the modal
+        var isNewRecord = target[0].id === ('addBtn') ? true : false;
+        $('#hiddenFormIsNewRecord').val(isNewRecord);
+        var modal = $(this);
+        
+        if (isNewRecord) {
+            // inits this dialog.
+            $.fn.initForm(modal.find("form"), true);
+            
+            $.ajax({
+                type: 'GET',
+                url: 'add',
+                dataType: 'json'
+            }).done(function (info) {
+                if (info.code === 0) {
+                    modal.find('.modal-title').text(info.data.formTitle);
+                    modal.find('.btn-primary').text(info.data.saveOrUpdate);
+                } else {
+                    $.fn.showSystemError(info);
+                }
+            }).fail(function (info) {
+                $.fn.showSystemErrorFault(info);
+            });
+        } else {
+            $.fn.editCurrentRecord(target, modal);
+        }
+    });
+    
+    /**
+     * This function retrieves the records from backend.
+     */
+    $.fn.searchRecordsRequest = function (httpMethod, url, data) {
+        $.ajax({
+            type: httpMethod,
+            url: url,
+            dataType: 'json',
+            data: data
+        }).done(function (info) {
+            if (info.code === 0) {
+                $.fn.updateDynaTable(info.data);
+            } else {
+                $.fn.showSystemError(info);
+            }
+        }).fail(function (info) {
+            $.fn.showSystemErrorFault(info);
+        });
+    };
+    /**
+     * Updates the records in a dynatable.
+     */
+    $.fn.updateDynaTable = function (records) {
+        $.fn.getDynaTable().settings.dataset.originalRecords = records;
+        $.fn.getDynaTable().process();
+    };
+    /**
+     * Gets the current dynatable.
+     */
+    $.fn.getDynaTable = function () {
+        var dynaTableNamePlain = document.getElementById("dynaTable").getAttribute("value");
+        return eval(dynaTableNamePlain);
+    };
+    /**
+     * This function inits fields in the modal window.
+     */
+    $.fn.initForm = function(form, resetFields) {
+        var selectorForm = "#" + form.attr('id');
+        
+        // removes all tooltips if any
+        $(selectorForm + ' input, ' + selectorForm + ' select').each(function (index) {
+            var input = $(this);
+            if (input.attr('type') !== 'hidden') {
+                input.closest('.form-group').removeClass('has-error');
+                input.popover('destroy');
+                if (resetFields) {
+                    input.val('');
+                }
+            }
+        });
+    };
+    /**
+     * Shows an application error message when a fault exists.
+     */
+    $.fn.showSystemErrorFault = function (info) {
+        var description = info.statusText + " (" + info.status + ")";
+        var text = (info.responseText).replace(/"/g, "\'");
+        var obj = JSON.parse('{"message":"' + description + '","data":"' + text + '"}');
+        $.fn.showSystemError(obj);
+    };
+    /**
+     * Shows an application error message.
+     */
+    $.fn.showSystemError = function (error) {
+        var trace = error.data;
+        trace = trace.replace(/\n/g, '&#13;');
+        var description = '<span style="color:red">' + error.message + ':</span>';
+        var textArea = '<textarea rows="15" style="font-size: 10px; color:white; background-color:black" class="form-control" placeholder="Not description available...">' + trace + '</textarea>';
+
+        var dialogInstance = new BootstrapDialog({
+            title: 'An error has occured, please check below details',
+            type: BootstrapDialog.TYPE_DANGER,
+            message: description + ' ' + textArea,
+            buttons: [{
+                    label: 'Close',
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                    }
+                }]
+        });
+        dialogInstance.setSize(BootstrapDialog.SIZE_WIDE);
+        dialogInstance.open();
+    };
+});
+/**
+ * Prevents the form from being submitted and retrieves records.
+ */
+ $(document).on('keypress', '* input', function (event) {
+    if (event.keyCode === 13) {
+        var currentForm = $(this).closest('form');
+        // invokes the click event on the button
+        currentForm.find('.btn-primary').trigger("click");
+        event.preventDefault();
+        return false;
+    }
+});

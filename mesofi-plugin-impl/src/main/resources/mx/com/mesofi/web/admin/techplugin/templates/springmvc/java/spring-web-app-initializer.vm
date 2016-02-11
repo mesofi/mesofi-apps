@@ -1,0 +1,46 @@
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+
+package ${packageName}.common;
+
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+/**
+ * This class is used to load web and root application context.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+public class SpringWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+    
+    /**
+     * Gets the root application context.
+     */
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class<?>[] { ApplicationContextConfig.class };
+    }
+    
+    /**
+     * Gets the web application context.
+     */
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class<?>[] { WebApplicationContextConfig.class };
+    }
+    
+    /**
+     * Gets the mappings.
+     */
+    @Override
+    protected String[] getServletMappings() {
+        return new String[] { "/" };
+    }
+}

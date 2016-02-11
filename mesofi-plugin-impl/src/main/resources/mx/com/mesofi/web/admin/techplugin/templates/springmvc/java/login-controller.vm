@@ -1,0 +1,107 @@
+#set ($classNameModelInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+#set ($classNameServiceInstance = "${classNameService.substring(0,1).toLowerCase()}${classNameService.substring(1)}")
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+
+package ${packageName}.${suffixPackageName};
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import ${packageName}.${suffixModelPackageName}.${classNameModel};
+import ${packageName}.service.${classNameService};
+
+import org.apache.log4j.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * This class controls all the requests coming from the client application.
+ *
+ * @author Mesofi
+ * @since ${date}
+ */
+@Controller
+public class ${className} {
+
+    /**
+     * log4j.
+     */
+    private static final Logger log = Logger.getLogger(${className}.class);
+
+    /**
+     * Injects the servlet context.
+     */
+    @Autowired
+    private ServletContext context;
+    
+    /**
+     * Service for ${classNameServiceInstance}.
+     */
+    @Autowired
+    private ${classNameService} ${classNameServiceInstance};
+    
+    /**
+     * This method is called when a resource '/' is invoked using the GET HTTP
+     * method, usually this method redirect the flow to the initial page.
+     *
+     * @param model
+     *          The model
+     * @return The logical page name.
+     */
+    @RequestMapping(value = "/", method = GET)
+    public String init(Model model) {
+        ${classNameModel} ${classNameModelInstance} = new ${classNameModel}();
+        model.addAttribute("${classNameModelInstance}", ${classNameModelInstance});
+        // redirect the flow to the initial page (index.jsp)
+        return "index";
+    }
+    
+    @RequestMapping(value = "/", method = POST)
+    public String loginUsuario(HttpServletRequest request, @ModelAttribute("${classNameModelInstance}") @Valid ${classNameModel} ${classNameModelInstance}, BindingResult result, Model model, Errors errors) {
+        if (errors.hasErrors()) {
+            return "index";
+        }
+        // authorizing the user using the service layer
+        ${classNameServiceInstance}.authUser(${classNameModelInstance});
+        
+        // creates the elements for the menu.
+        createMainMenu(request);
+        return "success";
+    }
+
+    private void createMainMenu(HttpServletRequest request) {
+        if (log.isDebugEnabled()) {
+            log.debug("Creating main menu ...");
+        }
+        List<DefaultMenuItem> menuModel = new ArrayList<>();
+
+#foreach( ${screen} in ${screens} )
+        DefaultMenuItem menuItem${velocityCount} = new DefaultMenuItem("${screen.screenName}");
+        menuItem${velocityCount}.setUrl(context.getContextPath() + "/catalogs/${screen.pageName}/");
+        menuModel.add(menuItem${velocityCount});
+        
+#end
+        request.getSession().setAttribute("menuModel", menuModel);
+    }
+}

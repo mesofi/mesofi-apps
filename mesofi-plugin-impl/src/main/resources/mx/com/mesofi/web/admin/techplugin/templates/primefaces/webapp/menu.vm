@@ -1,0 +1,21 @@
+#set ($classNameBeanInstance = "${classNameBean.substring(0,1).toLowerCase()}${classNameBean.substring(1)}")
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:form id="formMainMenu">
+        <p:outputPanel id="menuPanel" layout="block">
+            <p:menubar id="mb" model="#{${classNameBeanInstance}.menuModel}">
+                <f:facet name="options">
+                    <p:commandButton type="button" icon="ui-icon-home" />
+                    <p:commandButton type="button" icon="ui-icon-gear" />
+                    <p:commandButton type="button" value="Logout" icon="ui-icon-extlink" />
+                </f:facet>
+            </p:menubar>
+            <p:sticky target="mb" />
+        </p:outputPanel>
+    </h:form>
+</ui:composition>

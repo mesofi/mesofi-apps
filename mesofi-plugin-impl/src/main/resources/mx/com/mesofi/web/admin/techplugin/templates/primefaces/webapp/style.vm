@@ -1,0 +1,51 @@
+/* Styles override from Prime Faces */
+
+/* Allows the menu to be shown in layoutUnits */
+.ui-layout-north {
+    z-index: 20 !important;
+    overflow: visible !important;
+}
+
+/* Allows the menu to be shown in layoutUnits */
+.ui-layout-north .ui-layout-unit-content {
+    overflow: visible !important;
+}
+
+/* background color #ABC8DB */
+.ui-layout-unit,.ui-layout-unit-content {
+    background: #FFFFFF !important;
+}
+
+/* changes the font size for the application */
+.ui-widget {
+    font-size: 93% !important;
+}
+.ui-widget-data-table-column {
+    font-size: 83% !important;
+}
+.ui-selectonemenu-item, .ui-selectonemenu-list-item {
+    font-size: 83% !important;
+}
+
+/* removes the border from the layout */
+.ui-layout,.ui-layout-doc,.ui-layout-unit,.ui-layout-wrap,.ui-layout-bd,.ui-layout-hd {
+    border: none;
+}
+
+/* removes the border from the grid */
+.ui-panelgrid td,.ui-panelgrid tr {
+    border-style: none !important
+}
+
+/* changes the height of the split buttons */
+.ui-splitbutton-menubutton {
+    height: 35px;
+}
+
+/* changes the with of all drop downs controls */
+.ui-selectonemenu {
+    width: 160px !important;
+}
+.ui-selectonemenu-label {
+    width: 160px !important;
+}

@@ -1,0 +1,53 @@
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.common;
+ 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+
+/**
+ * This class is used as a converter for type Timestamp.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+@FacesConverter("timestampConverter")
+public class TimestampConverter extends AbstractController implements Converter {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getAsObject(FacesContext fc, UIComponent uic, String string) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(getMessage("catalog.form.format.datetime"));
+        Timestamp timeStamp = null;
+        try {
+            timeStamp = new Timestamp(dateFormat.parse(string).getTime());
+        } catch (ParseException ex) {
+            throw new IllegalStateException(ex);
+        }
+        return timeStamp;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getAsString(FacesContext fc, UIComponent uic, Object o) {
+        Timestamp timestamp = (Timestamp) o;
+        return new SimpleDateFormat(getMessage("catalog.form.format.datetime")).format(timestamp);
+    }
+}

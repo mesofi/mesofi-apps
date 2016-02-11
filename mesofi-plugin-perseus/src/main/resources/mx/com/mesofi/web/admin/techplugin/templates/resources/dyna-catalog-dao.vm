@@ -1,0 +1,78 @@
+#set ($classNameProp = "${classNameDao.substring(0,1).toLowerCase()}${classNameDao.substring(1)}")
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+        
+        <util:properties id="${classNameProp}">
+            <prop key="select.existing.records">
+                <![CDATA[
+                    SELECT 
+#foreach( ${field} in ${fields} )
+#if( $foreach.hasNext )
+                        ${field.fieldName},
+#else
+                        ${field.fieldName}
+#end
+#end
+                    FROM
+                        ${tableName}
+                    WHERE 1 = 1
+                ]]>
+            </prop>
+#foreach( ${field} in ${fields} )
+            <prop key="condition.existing.records.by.${field.fieldName.toLowerCase()}">
+                <![CDATA[
+@Pointcut("sql.finder.condition")
+                ]]>
+            </prop>
+#end
+            <prop key="insert.current.record">
+                <![CDATA[
+                    INSERT INTO ${tableName} (
+#foreach( ${field} in ${fields} )
+#if( $foreach.hasNext )
+                        ${field.fieldName},
+#else
+                        ${field.fieldName}
+#end
+#end
+                        )
+                    VALUES ( #foreach( ${field} in ${fields} )#if( $foreach.hasNext )?, #else ?#end#end )
+                ]]>
+            </prop>
+            <prop key="update.current.record">
+                <![CDATA[
+                    UPDATE ${tableName} SET 
+#foreach( ${field} in ${fields} )
+#if( ${field.primaryKey} == false )
+#if( $foreach.hasNext )
+                        ${field.fieldName} = ?,
+#else
+                        ${field.fieldName} = ?
+#end
+#else
+#if( ${fields.size()} == 1 )
+                        ${field.fieldName} = ${field.fieldName}
+#end
+#end
+#end
+                    WHERE
+#set ( $hasPk = false )
+#foreach( ${field} in ${fields} )
+#if ($hasPk && $field.primaryKey)
+                        AND ${field.fieldName} = ?
+#else
+#if( ${field.primaryKey} )
+#set ( $hasPk = true )
+                        ${field.fieldName} = ?
+#end
+#end
+#end                
+                ]]>
+            </prop>
+        </util:properties>
+</beans>

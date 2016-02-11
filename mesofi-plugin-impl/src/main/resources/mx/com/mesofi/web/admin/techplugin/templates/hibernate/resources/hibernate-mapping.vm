@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping package="${packageName}">
+    <class name="${className}" table="${tableName}">
+#foreach( ${field} in ${fields} )
+#if (${field.primaryKey})
+        <id name="${field.fieldJavaType}" type="${field.fieldFullyNameType}" column="${field.fieldName}" >
+            <generator class="native" />
+        </id>
+#else
+        <property name="${field.fieldJavaType}" type="${field.fieldFullyNameType}" column="${field.fieldName}" />
+#end
+#end
+    </class>
+</hibernate-mapping>

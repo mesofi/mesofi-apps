@@ -1,0 +1,365 @@
+#set ($classNameModelLInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+#set ($classNameModelUInstance = "${classNameModel.substring(0,1).toUpperCase()}${classNameModel.substring(1)}")
+#set ($classNameSearchLInstance = "${classNameSearch.substring(0,1).toLowerCase()}${classNameSearch.substring(1)}")
+#set ($classNameSearchUInstance = "${classNameSearch.substring(0,1).toUpperCase()}${classNameSearch.substring(1)}")
+#set ($classNameConfigModelLInstance = "${classNameConfigModel.substring(0,1).toLowerCase()}${classNameConfigModel.substring(1)}")
+#set ($classNameConfigModelUInstance = "${classNameConfigModel.substring(0,1).toUpperCase()}${classNameConfigModel.substring(1)}")
+#set ($classNameServiceInstance = "${classNameService.substring(0,1).toLowerCase()}${classNameService.substring(1)}")
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.${suffixPackageName};
+
+import java.io.Serializable;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import ${packageName}.service.${classNameService};
+import ${packageName}.${suffixModelPackageName}.${classNameConfigModel};
+import ${packageName}.${suffixModelPackageName}.${classNameModel};
+
+import ${basePackageName}.${suffixCommonPackageName}.AbstractController;
+import ${basePackageName}.${suffixCommonPackageName}.SpringContext;
+
+import org.apache.log4j.Logger;
+
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.CellEditEvent;
+
+/**
+ * Contains the logic to manage the request from clients.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+@ManagedBean
+@SessionScoped
+public class ${className} extends AbstractController implements Serializable {
+    
+    /**
+     * log4j.
+     */
+    private static final Logger log = Logger.getLogger(${className}.class);
+    
+    /**
+     * Action performed by the user either saver or update.
+     */
+    private boolean isNewRecord;
+    
+    /**
+     * Title of the form to edit the record.
+     */
+    private String formTitle;
+    
+    /**
+     * Label for save or edit button.
+     */
+    private String saveOrUpdate;
+    
+    /**
+     * List of ${classNameModel}s to be displayed.
+     */
+    private List<${classNameModel}> data;
+    
+    /**
+     * Value object to handle one single record.
+     */
+    private ${classNameModel} ${classNameModelLInstance} = new ${classNameModel}();
+    
+    /**
+     * Object used to search records.
+     */
+    private ${classNameModel} ${classNameSearchLInstance} = new ${classNameModel}();
+    
+    /**
+     * Object used to store configuration regarding fields.
+     */
+    private ${classNameConfigModel} ${classNameConfigModelLInstance} = new ${classNameConfigModel}();
+    
+    /**
+     * Service for ${classNameServiceInstance}.
+     */
+    private ${classNameService} ${classNameServiceInstance};
+    
+    /**
+     * @return the data
+     */
+    public List<${classNameModel}> getData() {
+        return data;
+    }
+    
+    /**
+     * Initializes this bean loading records.
+     */
+    @PostConstruct
+    public void init() {
+        retrieveRecordsFromDataSource();
+    }
+    
+    /**
+     * Filter the existing records.
+     */
+    public void clearSearchRecords() {
+        if (log.isDebugEnabled()) {
+            log.debug("Clear filtering...");
+        }
+        ${classNameSearchLInstance} = new ${classNameModel}();
+        retrieveRecordsFromDataSource();
+    }
+
+    /**
+     * Filter the existing records.
+     */
+    public void searchRecords() {
+        if (log.isDebugEnabled()) {
+            log.debug("Filtering records...");
+        }
+        ${classNameServiceInstance} = (${classNameService}) SpringContext.getInstance().getBean("${classNameServiceInstance}");
+        data = ${classNameServiceInstance}.getData(${classNameSearchLInstance});
+    }
+    
+    /**
+     * Adds a new record when the button 'Add' is pressed.
+     */
+    public void addRecord() {
+        if (log.isDebugEnabled()) {
+            log.debug("Before showing a new form to create a new record");
+        }
+        resetFields();
+#foreach( ${field} in ${fields} )
+#if( ${field.autoIncrement} )
+        this.${classNameConfigModelLInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Enabled(true);
+#end
+#end
+        
+        //adds the current record.
+        this.isNewRecord = true;
+        this.formTitle = getMessage("catalog.form.title.new");
+        this.saveOrUpdate = getMessage("catalog.form.button.save");
+    }
+    
+    /**
+     * Cancels the existing form when the button 'Cancel' is pressed.
+     */
+    public void cancelRecord() {
+        if (log.isDebugEnabled()) {
+            log.debug("Canceling the existing record");
+        }
+    }
+    
+    /**
+     * Edition of the current row.
+     * 
+     * @param event
+     *            The cell.
+     */
+    public void onCellEdit(CellEditEvent event) {
+        Object oldValue = event.getOldValue();
+        Object newValue = event.getNewValue();
+
+        DataTable dataTable = (DataTable) event.getSource();
+        ${classNameModel} rowSelected = (${classNameModel}) dataTable.getRowData();
+
+        if (newValue != null && !newValue.equals(oldValue)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Editing a cell in datatable...");
+            }
+            this.isNewRecord = false;
+            this.formTitle = getMessage("catalog.form.title.edit");
+            if (validateForm(rowSelected, true)) {
+                try {
+                    saveOrUpdateRecord(rowSelected);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    addErrorSystem(e.getMessage());
+                }
+            }
+        }
+    }
+    
+    public void saveOrUpdateRecord(${classNameModel} ${classNameModelLInstance}) {
+        ${classNameServiceInstance}.saveChanges(${classNameModelLInstance}, isNewRecord);
+        retrieveRecordsFromDataSource();
+        
+        String message = isNewRecord ? getMessage("catalog.form.msg.new") : getMessage("catalog.form.msg.updated");
+        addInfo(isNewRecord ? getMessage("catalog.form.msg.title.new") : getMessage("catalog.form.msg.title.updated"), message);
+    }
+    
+    /**
+     * Saves or updates the record.
+     */
+    public void saveOrUpdateRecord() {
+        if (log.isDebugEnabled()) {
+            log.debug("Saving or updating this record");
+        }
+        
+        if (!validateForm(${classNameModelLInstance}, false)) {
+            RequestContext.getCurrentInstance().execute("PF('dlg').show();");
+            return;
+        }
+        
+        try {
+            saveOrUpdateRecord(${classNameModelLInstance});
+            RequestContext.getCurrentInstance().execute("PF('dlg').hide();");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            addErrorSystem(e.getMessage());
+        }
+    }
+    
+    /**
+     * Edits the current record when the button 'Edit' is pressed.
+     *
+     * @param ${classNameModelLInstance}
+     *            The record to be updated.
+     */
+    public void editRecord(${classNameModel} ${classNameModelLInstance}) {
+        if (log.isDebugEnabled()) {
+            log.debug("Editing current record");
+        }
+        resetFields();
+        this.${classNameModelLInstance} = ${classNameModelLInstance};
+#foreach( ${field} in ${fields} )
+#if( ${field.primaryKey} )
+        this.${classNameConfigModelLInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Enabled(true);
+#end
+#end
+        
+        //edits the current record.
+        this.isNewRecord = false;
+        this.formTitle = getMessage("catalog.form.title.edit");
+        this.saveOrUpdate = getMessage("catalog.form.button.update");
+    }
+    
+    /**
+     * @return the ${classNameModelLInstance}
+     */
+    public ${classNameModel} get${classNameModelUInstance}() {
+        return ${classNameModelLInstance};
+    }
+    
+    /**
+     * @param ${classNameModelLInstance}
+     *            the ${classNameModelLInstance} to set
+     */
+    public void set${classNameModelUInstance}(${classNameModel} ${classNameModelLInstance}) {
+        this.${classNameModelLInstance} = ${classNameModelLInstance};
+    }
+    
+    /**
+     * @return the ${classNameSearchLInstance}
+     */
+    public ${classNameModel} get${classNameSearchUInstance}() {
+        return ${classNameSearchLInstance};
+    }
+    
+    /**
+     * @param ${classNameSearchLInstance}
+     *            the ${classNameSearchLInstance} to set
+     */
+    public void set${classNameSearchUInstance}(${classNameModel} ${classNameSearchLInstance}) {
+        this.${classNameSearchLInstance} = ${classNameSearchLInstance};
+    }
+    
+    /**
+     * @return the ${classNameConfigModelLInstance}
+     */
+    public ${classNameConfigModel} get${classNameConfigModelUInstance}() {
+        return ${classNameConfigModelLInstance};
+    }
+    
+    /**
+     * @return the formTitle
+     */
+    public String getFormTitle() {
+        return formTitle;
+    }
+    
+    /**
+     * @return the saveOrUpdate
+     */
+    public String getSaveOrUpdate() {
+        return saveOrUpdate;
+    }
+    
+    /**
+     * Gets records from data source.
+     */
+    private void retrieveRecordsFromDataSource() {
+        if (log.isDebugEnabled()) {
+            log.debug("Getting data from database...");
+        }
+        // retrieves spring bean from singleton.
+        ${classNameServiceInstance} = (${classNameService}) SpringContext.getInstance().getBean("${classNameServiceInstance}");
+        data = ${classNameServiceInstance}.getData();
+    }
+    
+    /**
+     * Reset all the fields in the form.
+     */
+    private void resetFields() {
+        ${classNameModelLInstance} = new ${classNameModel}();
+        ${classNameConfigModelLInstance} = new ${classNameConfigModel}();
+    }
+    
+    /**
+     * Validate input data from form.
+     * 
+     * @param input
+     *            Object to validate.
+     * @param isInline
+     *            If this parameter is true, then the validation should be shown
+     *            as an alert, otherwise from messages.
+     * 
+     * @return true if the data has no error, otherwise has errors.
+     */
+    private boolean validateForm(${classNameModel} input, boolean isInline) {
+        if (log.isDebugEnabled()) {
+            log.debug("Validating current form... inline? " + isInline);
+        }
+        boolean valid = true;
+#set( $configModelInstance = ${classNameConfigModel.substring(0,1).toLowerCase()} + ${classNameConfigModel.substring(1)} )
+#foreach( ${field} in ${fields} )
+        ${configModelInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Style("");
+#end
+
+        String reqMsg = getMessage("catalog.form.validation.required");
+        String longMsg = getMessage("catalog.form.validation.maxlength");
+        String scaleMsg = getMessage("catalog.form.validation.scale");
+
+        String errStyle = "ui-state-error";
+#foreach( ${field} in ${fields} )
+        String ${field.fieldJavaType} = getMessage("catalog.${pageName.toLowerCase()}.field.${field.fieldLabel.replace(" ","")}");
+#end
+
+#foreach( ${field} in ${fields} )
+#set( $effectiveField = ${field.fieldJavaType.substring(0,1).toUpperCase()} + ${field.fieldJavaType.substring(1)} )
+        // validation for ${field.fieldJavaType} field
+#if (!${field.optional})
+@Pointcut("controller.test.req.empty.primefaces")
+            addErrorValidation(isInline, ${field.fieldJavaType}, reqMsg);
+            ${configModelInstance}.set${effectiveField}Style(errStyle);
+            valid = false;
+@Pointcut("controller.test.req.size.primefaces")
+#else
+## optional field
+@Pointcut("controller.test.opt.empty")
+#end
+@Pointcut("controller.test.opt.size.primefaces")
+
+#end
+        return valid;
+    }
+    
+}

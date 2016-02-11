@@ -1,0 +1,428 @@
+#set ($classNameModelLInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+#set ($classNameModelUInstance = "${classNameModel.substring(0,1).toUpperCase()}${classNameModel.substring(1)}")
+#set ($classNameSearchLInstance = "${classNameSearch.substring(0,1).toLowerCase()}${classNameSearch.substring(1)}")
+#set ($classNameSearchUInstance = "${classNameSearch.substring(0,1).toUpperCase()}${classNameSearch.substring(1)}")
+#set ($classNameConfigModelLInstance = "${classNameConfigModel.substring(0,1).toLowerCase()}${classNameConfigModel.substring(1)}")
+#set ($classNameConfigModelUInstance = "${classNameConfigModel.substring(0,1).toUpperCase()}${classNameConfigModel.substring(1)}")
+#set ($classNameServiceInstance = "${classNameService.substring(0,1).toLowerCase()}${classNameService.substring(1)}")
+#set ($classNameFormModelLInstance = "${classNameFormModel.substring(0,1).toLowerCase()}${classNameFormModel.substring(1)}")
+#set ($classNameFormModelUInstance = "${classNameFormModel.substring(0,1).toUpperCase()}${classNameFormModel.substring(1)}")
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.${suffixPackageName};
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.validation.Valid;
+
+import ${packageName}.service.${classNameService};
+import ${packageName}.${suffixModelPackageName}.${classNameConfigModel};
+import ${packageName}.${suffixModelPackageName}.${classNameModel};
+
+import ${basePackageName}.${suffixCommonPackageName}.AbstractController;
+import ${basePackageName}.${suffixCommonPackageName}.Response;
+import ${basePackageName}.${suffixCommonPackageName}.SpringContext;
+
+import org.apache.log4j.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+/**
+ * Contains the logic to manage the request from clients.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+@Controller
+@RequestMapping(value = "/catalogs/${pageName.toLowerCase()}")
+public class ${className} extends AbstractController {
+    
+    /**
+     * log4j.
+     */
+    private static final Logger log = Logger.getLogger(${className}.class);
+    
+    /**
+     * Action performed by the user either saver or update.
+     */
+    //private boolean isNewRecord;
+    
+    /**
+     * Title of the form to edit the record.
+     */
+    //private String formTitle;
+    
+    /**
+     * Label for save or edit button.
+     */
+    //private String saveOrUpdate;
+    
+    /**
+     * List of ${classNameModel}s to be displayed.
+     */
+    //private List<${classNameModel}> data;
+    
+    /**
+     * Value object to handle one single record.
+     */
+    //private ${classNameModel} ${classNameModelLInstance} = new ${classNameModel}();
+    
+    /**
+     * Object used to search records.
+     */
+    //private ${classNameModel} ${classNameSearchLInstance} = new ${classNameModel}();
+    
+    /**
+     * Object used to store configuration regarding fields.
+     */
+    //private ${classNameConfigModel} ${classNameConfigModelLInstance} = new ${classNameConfigModel}();
+    
+    /**
+     * Service for ${classNameServiceInstance}.
+     */
+    @Autowired
+    private ${classNameService} ${classNameServiceInstance};
+    
+    /**
+     * @return the data
+     */
+    //public List<${classNameModel}> getData() {
+    //    return data;
+    //}
+    
+    /**
+     * Initializes this bean loading records.
+     * @return Logical identifier.
+     */
+    @RequestMapping(value = "/", method = GET)
+    public String init(Model model) {
+        // this attribute will be used for the filtering form
+        model.addAttribute(new ${classNameModel}());
+        // this attribute will be used for the save/update operations
+        model.addAttribute(new ${classNameFormModel}());
+        
+        return "${pageName.toLowerCase()}";
+    }
+    
+    /**
+     * Filter the existing records.
+     */
+    public void clearSearchRecords() {
+        if (log.isDebugEnabled()) {
+            log.debug("Clear filtering...");
+        }
+        //${classNameSearchLInstance} = new ${classNameModel}();
+        retrieveRecordsFromDataSource();
+    }
+
+    /**
+     * Filter the existing records.
+     */
+    @RequestMapping(value = "/search", method = {GET, POST})
+    public @ResponseBody Response searchRecords(@ModelAttribute("${classNameModelLInstance}") @Valid ${classNameModel} ${classNameSearchLInstance}) {
+        if (log.isDebugEnabled()) {
+            log.debug("Filtering records...");
+        }
+        List<${classNameModel}> data = null;
+        try {
+            data = ${classNameServiceInstance}.getData(${classNameSearchLInstance});
+            return response(data);
+        } catch (Throwable e) {
+            return response(e);
+        }
+    }
+    
+    /**
+     * Adds a new record when the button 'Add' is pressed.
+     */
+    @RequestMapping(value = "/add", method = GET)
+    public @ResponseBody Response addRecord(Locale locale) {
+        if (log.isDebugEnabled()) {
+            log.debug("Before showing a new form to create a new record");
+        }
+        resetFields();
+#foreach( ${field} in ${fields} )
+#if( ${field.autoIncrement} )
+        //this.${classNameConfigModelLInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Enabled(true);
+#end
+#end
+        
+        //adds the current record.
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("isNewRecord", "true");
+        data.put("formTitle", getMessage("catalog.form.title.new", locale));
+        data.put("saveOrUpdate", getMessage("catalog.form.button.save", locale));
+        return response(data);
+    }
+    
+    /**
+     * Cancels the existing form when the button 'Cancel' is pressed.
+     */
+    public void cancelRecord() {
+        if (log.isDebugEnabled()) {
+            log.debug("Canceling the existing record");
+        }
+    }
+    
+    /**
+     * Edition of the current row.
+     * 
+     * @param event
+     *            The cell.
+     */
+     @RequestMapping(value = "/update", method = POST)
+    public @ResponseBody Response onCellEdit(@ModelAttribute("${classNameFormModelLInstance}") @Valid ${classNameFormModel} ${classNameFormModelLInstance}, @RequestParam(value = "isNewRecord") boolean isNewRecord, Locale locale) {
+        Response response = null;
+        try {
+            // creates an object that will be used to search in db.
+            ${classNameModel} ${classNameModelLInstance} = new ${classNameModel}();
+#foreach( ${field} in ${fields} )
+#if (${field.primaryKey})
+#set( $effectiveField = ${field.fieldJavaType.substring(0,1).toUpperCase()} + ${field.fieldJavaType.substring(1)} )
+            ${classNameModelLInstance}.set${effectiveField}(${classNameFormModelLInstance}.get${classNameModelUInstance}().get${effectiveField}());
+#end
+#end
+            // finds the obj in db.
+            ${classNameModel} found = ${classNameServiceInstance}.getData(${classNameModelLInstance}).get(0);
+            
+            // complements the object
+            complementRecordToUpdate(found, ${classNameFormModelLInstance}.get${classNameModelUInstance}());
+            
+            Map<String, String> result = validateForm(${classNameFormModelLInstance}, true, locale);
+            if (result.isEmpty()) {
+                response = response(saveOrUpdateRecord(${classNameFormModelLInstance}.get${classNameModelUInstance}(), isNewRecord), false);
+            } else {
+                response = response(result, true);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            response = response(e);
+        }
+        return response;
+    }
+    
+    public Map<String, String> saveOrUpdateRecord(${classNameModel} ${classNameModelLInstance}, boolean isNewRecord) {
+        Map<String, String> data = new HashMap<String, String>();
+        ${classNameServiceInstance}.saveChanges(${classNameModelLInstance}, isNewRecord);
+        retrieveRecordsFromDataSource();
+        
+        //String message = isNewRecord ? getMessage("catalog.form.msg.new") : getMessage("catalog.form.msg.updated");
+        //addInfo(isNewRecord ? getMessage("catalog.form.msg.title.new") : getMessage("catalog.form.msg.title.updated"), message);
+        
+        return data;
+    }
+    
+    /**
+     * Saves or updates the record.
+     */
+    @RequestMapping(value = "/save-update", method = POST)
+    public @ResponseBody Response saveOrUpdateRecord(@ModelAttribute("${classNameFormModelLInstance}") @Valid ${classNameFormModel} ${classNameFormModelLInstance}, @RequestParam(value = "isNewRecord") boolean isNewRecord, Locale locale) {
+        if (log.isDebugEnabled()) {
+            log.debug("Saving or updating this record");
+        }
+        Response response = null;
+        try {
+            Map<String, String> result = validateForm(${classNameFormModelLInstance}, false, locale);
+            if (result.isEmpty()) {
+                response = response(saveOrUpdateRecord(${classNameFormModelLInstance}.get${classNameModelUInstance}(), isNewRecord), false);
+            } else {
+                response = response(result, true);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            response = response(e);
+        }
+        return response;
+    }
+    
+    /**
+     * Edits the current record when the button 'Edit' is pressed.
+     *
+     * @param ${classNameModelLInstance}
+     *            The record to be updated.
+     */
+    @RequestMapping(value = "/edit/{entityId}", method = GET)
+    public @ResponseBody Response editRecord(@PathVariable("entityId") int id, Locale locale) {
+        if (log.isDebugEnabled()) {
+            log.debug("Editing current record");
+        }
+        resetFields();
+        
+        //edits the current record.
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("isNewRecord", "false");
+        data.put("formTitle", getMessage("catalog.form.title.edit", locale));
+        data.put("saveOrUpdate", getMessage("catalog.form.button.update", locale));
+        
+        ${classNameModel} ${classNameModelLInstance} = new ${classNameModel}(); 
+#foreach( ${field} in ${fields} )
+#if( ${field.primaryKey} )
+        ${classNameModelLInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}(id);
+#end
+#end
+        // finds the obj in db.
+        ${classNameModel} found = ${classNameServiceInstance}.getData(${classNameModelLInstance}).get(0);    
+        
+        Map<String, Object> info = new HashMap<String, Object>();
+        info.put("recordFound", found);
+        
+        data.put("values", info);
+        return response(data);
+    }
+    
+    /**
+     * @return the ${classNameModelLInstance}
+     */
+    //public ${classNameModel} get${classNameModelUInstance}() {
+    //    return ${classNameModelLInstance};
+    //}
+    
+    /**
+     * @param ${classNameModelLInstance}
+     *            the ${classNameModelLInstance} to set
+     */
+    //public void set${classNameModelUInstance}(${classNameModel} ${classNameModelLInstance}) {
+    //    this.${classNameModelLInstance} = ${classNameModelLInstance};
+    //}
+    
+    /**
+     * @return the ${classNameSearchLInstance}
+     */
+    //public ${classNameModel} get${classNameSearchUInstance}() {
+    //    return ${classNameSearchLInstance};
+    //}
+    
+    /**
+     * @param ${classNameSearchLInstance}
+     *            the ${classNameSearchLInstance} to set
+     */
+    //public void set${classNameSearchUInstance}(${classNameModel} ${classNameSearchLInstance}) {
+    //    this.${classNameSearchLInstance} = ${classNameSearchLInstance};
+    //}
+    
+    /**
+     * @return the ${classNameConfigModelLInstance}
+     */
+    //public ${classNameConfigModel} get${classNameConfigModelUInstance}() {
+    //    return ${classNameConfigModelLInstance};
+    //}
+    
+    /**
+     * @return the formTitle
+     */
+    public String getFormTitle() {
+        //return formTitle;
+        return "formTitle";
+    }
+    
+    /**
+     * @return the saveOrUpdate
+     */
+    public String getSaveOrUpdate() {
+        //return saveOrUpdate;
+        return "saveOrUpdate";
+    }
+    
+    /**
+     * Gets records from data source.
+     */
+    private void retrieveRecordsFromDataSource() {
+        if (log.isDebugEnabled()) {
+            log.debug("Getting data from database...");
+        }
+        // retrieves spring bean from singleton.
+        //data = ${classNameServiceInstance}.getData();
+    }
+    
+    /**
+     * Reset all the fields in the form.
+     */
+    private void resetFields() {
+        //${classNameModelLInstance} = new ${classNameModel}();
+        //${classNameConfigModelLInstance} = new ${classNameConfigModel}();
+    }
+    
+    /**
+     * Validate input data from form.
+     * 
+     * @param input
+     *            Object to validate.
+     * @param isInline
+     *            If this parameter is true, then the validation should be shown
+     *            as an alert, otherwise from messages.
+     * @param locale
+     *            The locale.
+     * 
+     * @return A structure with the validation result.
+     */
+    private Map<String, String> validateForm(${classNameFormModel} input, boolean isInline, Locale locale) {
+        if (log.isDebugEnabled()) {
+            log.debug("Validating current form... inline? " + isInline);
+        }
+        Map<String, String> result = new HashMap<String, String>();
+        boolean valid = true;
+#set( $configModelInstance = ${classNameConfigModel.substring(0,1).toLowerCase()} + ${classNameConfigModel.substring(1)} )
+#foreach( ${field} in ${fields} )
+        //${configModelInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Style("");
+#end
+
+        String reqMsg = getMessage("catalog.form.validation.required", locale);
+        String longMsg = getMessage("catalog.form.validation.maxlength", locale);
+        String scaleMsg = getMessage("catalog.form.validation.scale", locale);
+
+        String errStyle = "ui-state-error";
+#foreach( ${field} in ${fields} )
+        String ${field.fieldJavaType} = getMessage("catalog.${pageName.toLowerCase()}.field.${field.fieldLabel.replace(" ","")}", locale);
+#end
+
+#foreach( ${field} in ${fields} )
+#set( $effectiveField = ${field.fieldJavaType.substring(0,1).toUpperCase()} + ${field.fieldJavaType.substring(1)} )
+        // validation for ${field.fieldJavaType} field
+#if (!${field.optional})
+@Pointcut("controller.test.req.empty.springmvc")
+            result.put("${classNameModelLInstance}.${field.fieldJavaType}", getMessage(${field.fieldJavaType}, reqMsg));
+            //--${configModelInstance}.set${effectiveField}Style(errStyle);
+            valid = false;
+@Pointcut("controller.test.req.size.springmvc")
+#else
+## optional field
+@Pointcut("controller.test.opt.empty")
+#end
+@Pointcut("controller.test.opt.size.springmvc")
+
+#end
+        return result;
+    }
+    
+    private void complementRecordToUpdate(${classNameModelUInstance} found, ${classNameModelUInstance} input) {
+#foreach( ${field} in ${fields} )
+#set( $effectiveField = ${field.fieldJavaType.substring(0,1).toUpperCase()} + ${field.fieldJavaType.substring(1)} )
+#if (!${field.primaryKey})
+        if (input.get${effectiveField}() != null) {
+            found.set${effectiveField}(input.get${effectiveField}());
+        }
+#end
+#end
+    }
+}

@@ -1,0 +1,32 @@
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.${suffixPackageName};
+
+import java.util.List;
+
+import ${packageName}.${suffixModelPackageName}.${classNameModel};
+
+/**
+ * Manage the persistence logic for this application.
+ * Template name: [${templateName}]
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+public interface ${className} {
+    
+    public void saveRecord(${classNameModel} ${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)});
+    
+    public void updateRecord(${classNameModel} ${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)});
+    
+    public List<${classNameModel}> getData();
+    
+    public List<${classNameModel}> getData(${classNameModel} ${classNameSearch.substring(0,1).toLowerCase()}${classNameSearch.substring(1)});
+}

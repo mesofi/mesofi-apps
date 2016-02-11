@@ -1,0 +1,4 @@
+# This file contains all the validation messages for the application organized by module.
+
+login.form.username.validation.required=Username field does not have a valid value
+login.form.password.validation.required=Password field does not have a valid value

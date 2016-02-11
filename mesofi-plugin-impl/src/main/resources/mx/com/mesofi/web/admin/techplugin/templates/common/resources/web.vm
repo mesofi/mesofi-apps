@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+    
+    <display-name>$!displayName</display-name>
+    
+#foreach( $listener in $allListeners )
+#if($listener.comments && !$listener.comments.empty) 
+    <!-- $listener.comments -->
+#end
+    <listener>
+        <listener-class>
+            $listener.listenerClass
+        </listener-class>
+    </listener>
+
+#end
+#foreach( $webContext in $allWebContext )
+#if($webContext.comments && !$webContext.comments.empty) 
+    <!-- $webContext.comments -->
+#end
+    <context-param>
+        <param-name>$webContext.paramName</param-name>
+        <param-value>$webContext.paramValue</param-value>
+    </context-param>
+    
+#end
+#foreach( $webServlet in $allServlets )
+    <servlet>
+        <servlet-name>$webServlet.servletName</servlet-name>
+        <servlet-class>$webServlet.servletClass</servlet-class>
+        <load-on-startup>$webServlet.loadOnStartUp</load-on-startup>
+	</servlet>
+
+#foreach( $url in $webServlet.urlPattern )
+    <servlet-mapping>
+        <servlet-name>$webServlet.servletName</servlet-name>
+        <url-pattern>$url</url-pattern>
+    </servlet-mapping>
+	
+#end
+#end
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+
+    <welcome-file-list>
+        <welcome-file>$!welcomeFile</welcome-file>
+    </welcome-file-list>
+    
+</web-app>

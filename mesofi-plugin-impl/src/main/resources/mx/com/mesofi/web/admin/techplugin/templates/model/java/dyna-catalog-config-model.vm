@@ -1,0 +1,58 @@
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName};
+
+import java.io.Serializable;
+
+/**
+ * Contains all fields for a particular module.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+public class ${classNameConfig} implements Serializable {
+#foreach( ${field} in ${fields} )
+    private String ${field.fieldJavaType}Style;
+    private boolean ${field.fieldJavaType}Enabled;
+#end
+
+#foreach( ${field} in ${fields} )    
+    /**
+     * @return the ${field.fieldJavaType}Style
+     */
+    public String get${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Style() {
+        return ${field.fieldJavaType}Style;
+    }
+    
+    /**
+     * @param ${field.fieldJavaType}Style
+     *            the ${field.fieldJavaType}Style to set
+     */
+    public void set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Style(String ${field.fieldJavaType}Style) {
+        this.${field.fieldJavaType}Style = ${field.fieldJavaType}Style;
+    }
+    
+    /**
+     * @return the ${field.fieldJavaType}Enabled
+     */
+    public boolean is${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Enabled() {
+        return ${field.fieldJavaType}Enabled;
+    }
+    
+    /**
+     * @param ${field.fieldJavaType}Enabled
+     *            the ${field.fieldJavaType}Enabled to set
+     */
+    public void set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Enabled(boolean ${field.fieldJavaType}Enabled) {
+        this.${field.fieldJavaType}Enabled = ${field.fieldJavaType}Enabled;
+    }
+    
+#end
+}

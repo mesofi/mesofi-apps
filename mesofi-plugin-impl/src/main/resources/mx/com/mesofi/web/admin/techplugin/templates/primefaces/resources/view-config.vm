@@ -1,0 +1,18 @@
+# This file contains all view configurations made to the web application.
+
+#foreach( ${field} in ${allFields} )
+# Visibility for filter section for page ${field.pageName}.
+ui.${field.pageName}.filter.visible=true
+#foreach( ${f} in ${field.appFields} )
+ui.${field.pageName}.field.visible.${f.fieldLabel.replace(" ","")}=true
+#end
+
+#end
+#foreach( ${field} in ${allFields} )
+# Visibility for columns datatable for page ${field.pageName}.
+ui.${field.pageName}.datatable.visible=true
+#foreach( ${f} in ${field.appFields} )
+ui.${field.pageName}.column.visible.${f.fieldLabel.replace(" ","")}=true
+#end
+
+#end

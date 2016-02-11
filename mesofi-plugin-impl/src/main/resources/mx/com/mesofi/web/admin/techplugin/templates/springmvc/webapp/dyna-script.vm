@@ -1,0 +1,89 @@
+#set ($classNameModelLInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+#set ($classNameConfigLInstance = "${classNameConfigModel.substring(0,1).toLowerCase()}${classNameConfigModel.substring(1)}")
+/* Script used for this application */
+$(document).ready(function () {
+    /**
+     * After processing the dynatable.
+     */
+    $.fn.afterProcessDynaTable = function (e, dynatable) {
+#foreach( ${field} in ${fields} )
+#if (${field.primaryKey})
+        var key = '${field.fieldJavaType}';
+#else      
+        // edition for the field ${field.fieldJavaType}
+        $('a[id^=row]').editable({
+            type: 'text',
+            url: 'update',
+            title: 'Enter new Value',
+            send: 'always',
+            params: function (params) {  //params already contain 'name', 'value' and 'pk'
+                var pk = null;
+                var prefix = 'pk_';
+                // gets the siblings of the parent to find the pk.
+                var siblings = $(this).parent().siblings();
+                $.each(siblings, function (index, value) {
+                    var myId = value.id;
+                    if (myId.startsWith(prefix)) {
+                        pk = myId.substring(prefix.length);
+                    }
+                });
+                
+                var data = {};
+                data['isNewRecord'] = false;
+                data['${classNameModelLInstance}.' + key] = pk;
+                data['${classNameModelLInstance}.${field.fieldJavaType}'] = params.value;
+                data['${classNameConfigLInstance}.${field.fieldJavaType}Enabled'] = true;
+                return data;
+            }, ajaxOptions: {
+                type: 'post'
+            }, success: function (info, newValue) {
+                if (info.code === 0) {
+                } else if (info.code === 300) {
+                } else {
+                    $.fn.showSystemError(info);
+                }
+            }
+        });
+        
+#end
+#end
+    };
+    
+    /**
+     * 
+     */
+    $.fn.editCurrentRecord = function (target, modal) {
+        var selectorForm = '#formDialog';
+        var pk = null;
+        var prefix = 'pk_';
+        
+        // gets the siblings of the parent to find the pk.
+        var siblings = target.parent().siblings();
+        $.each(siblings, function (index, value) {
+            var myId = value.id;
+            if (myId.startsWith(prefix)) {
+                pk = myId.substring(prefix.length);
+            }
+        });
+        
+        $.ajax({
+            type: 'GET',
+            url: 'edit/' + pk,
+            dataType: 'json'
+        }).done(function (info) {
+            if (info.code === 0) {
+                modal.find('.modal-title').text(info.data.formTitle);
+                modal.find('.btn-primary').text(info.data.saveOrUpdate);
+                
+                $.fn.initForm($(selectorForm), false);
+                $.each(info.data.values.recordFound, function (fieldName, obj) {
+                    $(selectorForm + " input[name='${classNameModelLInstance}." + fieldName + "']").val(obj);
+                });
+            } else {
+                $.fn.showSystemError(info);
+            }
+        }).fail(function (info) {
+            $.fn.showSystemErrorFault(info);
+        });
+    };
+});

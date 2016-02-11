@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+    <!-- shows the default template for the application -->
+    <definition name="DefaultTemplate" template="/templates/template.jsp">
+        <put-attribute name="header" value="/templates/menu.jsp" />
+    </definition>
+    
+    <!-- shows the initial page -->
+    <definition name = "index" template = "index.jsp" />
+    
+    <!-- shows a default page when user logs in the application -->
+    <definition name="success" extends="DefaultTemplate">
+        <put-attribute name="body" value="/templates/default.jsp" />
+    </definition>
+    
+#foreach( ${screen} in ${screens} )
+    <!-- mapping for page ${screen.screenName.toLowerCase()} -->
+    <definition name="${screen.screenName.toLowerCase()}" extends="DefaultTemplate">
+        <put-attribute name="body" value="/catalogs/${screen.screenName.toLowerCase()}.jsp" />
+    </definition>
+    
+#end
+</tiles-definitions>

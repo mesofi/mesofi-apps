@@ -1,0 +1,363 @@
+#set ($classNameVoLInstance = "${classNameVo.substring(0,1).toLowerCase()}${classNameVo.substring(1)}")
+#set ($classNameVoUInstance = "${classNameVo.substring(0,1).toUpperCase()}${classNameVo.substring(1)}")
+#set ($classNameSearchLInstance = "${classNameSearch.substring(0,1).toLowerCase()}${classNameSearch.substring(1)}")
+#set ($classNameSearchUInstance = "${classNameSearch.substring(0,1).toUpperCase()}${classNameSearch.substring(1)}")
+#set ($classNameConfigVoLInstance = "${classNameConfigVo.substring(0,1).toLowerCase()}${classNameConfigVo.substring(1)}")
+#set ($classNameConfigVoUInstance = "${classNameConfigVo.substring(0,1).toUpperCase()}${classNameConfigVo.substring(1)}")
+#set ($classNameServiceInstance = "${classNameService.substring(0,1).toLowerCase()}${classNameService.substring(1)}")
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.catalogs.${moduleName}.bean;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import ${packageName}.catalogs.${moduleName}.service.${classNameService};
+import ${packageName}.catalogs.${moduleName}.vo.${classNameConfigVo};
+import ${packageName}.catalogs.${moduleName}.vo.${classNameVo};
+
+import ${packageName}.common.AbstractController;
+import ${packageName}.common.SpringContext;
+
+import org.apache.log4j.Logger;
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.CellEditEvent;
+
+/**
+ * Contains the logic to manage the request from clients.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+@ManagedBean
+@SessionScoped
+public class ${className} extends AbstractController implements Serializable {
+    
+    /**
+     * log4j.
+     */
+    private static final Logger log = Logger.getLogger(${className}.class);
+    
+    /**
+     * Action performed by the user either saver or update.
+     */
+    private boolean isNewRecord;
+    
+    /**
+     * Title of the form to edit the record.
+     */
+    private String formTitle;
+    
+    /**
+     * Label for save or edit button.
+     */
+    private String saveOrUpdate;
+    
+    /**
+     * List of ${classNameVo}s to be displayed.
+     */
+    private List<${classNameVo}> data;
+    
+    /**
+     * Value object to handle one single record.
+     */
+    private ${classNameVo} ${classNameVoLInstance} = new ${classNameVo}();
+    
+    /**
+     * Object used to search records.
+     */
+    private ${classNameVo} ${classNameSearchLInstance} = new ${classNameVo}();
+    
+    /**
+     * Object used to store configuration regarding fields.
+     */
+    private ${classNameConfigVo} ${classNameConfigVoLInstance} = new ${classNameConfigVo}();
+    
+    /**
+     * Service for ${classNameServiceInstance}.
+     */
+    private ${classNameService} ${classNameServiceInstance};
+    
+    /**
+     * @return the data
+     */
+    public List<${classNameVo}> getData() {
+        return data;
+    }
+    
+    /**
+     * Initializes this bean loading records.
+     */
+    @PostConstruct
+    public void init() {
+        retrieveRecordsFromDataSource();
+    }
+    
+    /**
+     * Filter the existing records.
+     */
+    public void clearSearchRecords() {
+        if (log.isDebugEnabled()) {
+            log.debug("Clear filtering...");
+        }
+        ${classNameSearchLInstance} = new ${classNameVo}();
+        retrieveRecordsFromDataSource();
+    }
+
+    /**
+     * Filter the existing records.
+     */
+    public void searchRecords() {
+        if (log.isDebugEnabled()) {
+            log.debug("Filtering records...");
+        }
+        ${classNameServiceInstance} = (${classNameService}) SpringContext.getInstance().getBean("${classNameServiceInstance}");
+        data = ${classNameServiceInstance}.getData(${classNameSearchLInstance});
+    }
+    
+    /**
+     * Adds a new record when the button 'Add' is pressed.
+     */
+    public void addRecord() {
+        if (log.isDebugEnabled()) {
+            log.debug("Before showing a new form to create a new record");
+        }
+        resetFields();
+#foreach( ${field} in ${fields} )
+#if( ${field.autoIncrement} )
+        this.${classNameConfigVoLInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Enabled(true);
+#end
+#end
+        
+        //adds the current record.
+        this.isNewRecord = true;
+        this.formTitle = getMessage("catalog.form.title.new");
+        this.saveOrUpdate = getMessage("catalog.form.button.save");
+    }
+    
+    /**
+     * Cancels the existing form when the button 'Cancel' is pressed.
+     */
+    public void cancelRecord() {
+        if (log.isDebugEnabled()) {
+            log.debug("Canceling the existing record");
+        }
+    }
+    
+    /**
+     * Edition of the current row.
+     * 
+     * @param event
+     *            The cell.
+     */
+    public void onCellEdit(CellEditEvent event) {
+        Object oldValue = event.getOldValue();
+        Object newValue = event.getNewValue();
+
+        DataTable dataTable = (DataTable) event.getSource();
+        ${classNameVo} rowSelected = (${classNameVo}) dataTable.getRowData();
+
+        if (newValue != null && !newValue.equals(oldValue)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Editing a cell in datatable...");
+            }
+            this.isNewRecord = false;
+            this.formTitle = getMessage("catalog.form.title.edit");
+            if (validateForm(rowSelected, true)) {
+                try {
+                    saveOrUpdateRecord(rowSelected);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    addErrorSystem(e.getMessage());
+                }
+            }
+        }
+    }
+    
+    public void saveOrUpdateRecord(${classNameVo} ${classNameVoLInstance}) {
+        ${classNameServiceInstance}.saveChanges(${classNameVoLInstance}, isNewRecord);
+        retrieveRecordsFromDataSource();
+        
+        String message = isNewRecord ? getMessage("catalog.form.msg.new") : getMessage("catalog.form.msg.updated");
+        addInfo(isNewRecord ? getMessage("catalog.form.msg.title.new") : getMessage("catalog.form.msg.title.updated"), message);
+    }
+    
+    /**
+     * Saves or updates the record.
+     */
+    public void saveOrUpdateRecord() {
+        if (log.isDebugEnabled()) {
+            log.debug("Saving or updating this record");
+        }
+        
+        if (!validateForm(${classNameVoLInstance}, false)) {
+            RequestContext.getCurrentInstance().execute("PF('dlg').show();");
+            return;
+        }
+        
+        try {
+            saveOrUpdateRecord(${classNameVoLInstance});
+            RequestContext.getCurrentInstance().execute("PF('dlg').hide();");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            addErrorSystem(e.getMessage());
+        }
+    }
+    
+    /**
+     * Edits the current record when the button 'Edit' is pressed.
+     *
+     * @param ${classNameVoLInstance}
+     *            The record to be updated.
+     */
+    public void editRecord(${classNameVo} ${classNameVoLInstance}) {
+        if (log.isDebugEnabled()) {
+            log.debug("Editing current record");
+        }
+        resetFields();
+        this.${classNameVoLInstance} = ${classNameVoLInstance};
+#foreach( ${field} in ${fields} )
+#if( ${field.primaryKey} )
+        this.${classNameConfigVoLInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Enabled(true);
+#end
+#end
+        
+        //edits the current record.
+        this.isNewRecord = false;
+        this.formTitle = getMessage("catalog.form.title.edit");
+        this.saveOrUpdate = getMessage("catalog.form.button.update");
+    }
+    
+    /**
+     * @return the ${classNameVoLInstance}
+     */
+    public ${classNameVo} get${classNameVoUInstance}() {
+        return ${classNameVoLInstance};
+    }
+    
+    /**
+     * @param ${classNameVoLInstance}
+     *            the ${classNameVoLInstance} to set
+     */
+    public void set${classNameVoUInstance}(${classNameVo} ${classNameVoLInstance}) {
+        this.${classNameVoLInstance} = ${classNameVoLInstance};
+    }
+    
+    /**
+     * @return the ${classNameSearchLInstance}
+     */
+    public ${classNameVo} get${classNameSearchUInstance}() {
+        return ${classNameSearchLInstance};
+    }
+    
+    /**
+     * @param ${classNameSearchLInstance}
+     *            the ${classNameSearchLInstance} to set
+     */
+    public void set${classNameSearchUInstance}(${classNameVo} ${classNameSearchLInstance}) {
+        this.${classNameSearchLInstance} = ${classNameSearchLInstance};
+    }
+    
+    /**
+     * @return the ${classNameConfigVoLInstance}
+     */
+    public ${classNameConfigVo} get${classNameConfigVoUInstance}() {
+        return ${classNameConfigVoLInstance};
+    }
+    
+    /**
+     * @return the formTitle
+     */
+    public String getFormTitle() {
+        return formTitle;
+    }
+    
+    /**
+     * @return the saveOrUpdate
+     */
+    public String getSaveOrUpdate() {
+        return saveOrUpdate;
+    }
+    
+    /**
+     * Gets records from data source.
+     */
+    private void retrieveRecordsFromDataSource() {
+        if (log.isDebugEnabled()) {
+            log.debug("Getting data from database...");
+        }
+        // retrieves spring bean from singleton.
+        ${classNameServiceInstance} = (${classNameService}) SpringContext.getInstance().getBean("${classNameServiceInstance}");
+        data = ${classNameServiceInstance}.getData();
+    }
+    
+    /**
+     * Reset all the fields in the form.
+     */
+    private void resetFields() {
+        ${classNameVoLInstance} = new ${classNameVo}();
+        ${classNameConfigVoLInstance} = new ${classNameConfigVo}();
+    }
+    
+    /**
+     * Validate input data from form.
+     * 
+     * @param input
+     *            Object to validate.
+     * @param isInline
+     *            If this parameter is true, then the validation should be shown
+     *            as an alert, otherwise from messages.
+     * 
+     * @return true if the data has no error, otherwise has errors.
+     */
+    private boolean validateForm(${classNameVo} input, boolean isInline) {
+        if (log.isDebugEnabled()) {
+            log.debug("Validating current form... inline? " + isInline);
+        }
+        boolean valid = true;
+#set( $configVoInstance = ${classNameConfigVo.substring(0,1).toLowerCase()} + ${classNameConfigVo.substring(1)} )
+#foreach( ${field} in ${fields} )
+        ${configVoInstance}.set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}Style("");
+#end
+
+        String reqMsg = getMessage("catalog.form.validation.required");
+        String longMsg = getMessage("catalog.form.validation.maxlength");
+        String scaleMsg = getMessage("catalog.form.validation.scale");
+
+        String errStyle = "ui-state-error";
+#foreach( ${field} in ${fields} )
+        String ${field.fieldJavaType} = getMessage("catalog.${pageName.toLowerCase()}.field.${field.fieldLabel.replace(" ","")}");
+#end
+
+#foreach( ${field} in ${fields} )
+#set( $effectiveField = ${field.fieldJavaType.substring(0,1).toUpperCase()} + ${field.fieldJavaType.substring(1)} )
+        // validation for ${field.fieldJavaType} field
+#if (!${field.optional})
+@Pointcut("controller.test.req.empty.primefaces")
+            addErrorValidation(isInline, ${field.fieldJavaType}, reqMsg);
+            ${configVoInstance}.set${effectiveField}Style(errStyle);
+            valid = false;
+@Pointcut("controller.test.req.size.primefaces")
+#else
+## optional field
+@Pointcut("controller.test.opt.empty")
+#end
+@Pointcut("controller.test.opt.size.primefaces")
+
+#end
+        return valid;
+    }
+    
+}

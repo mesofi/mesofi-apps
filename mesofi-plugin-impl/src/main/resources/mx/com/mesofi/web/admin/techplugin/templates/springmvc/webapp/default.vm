@@ -1,0 +1,12 @@
+<br/>
+<br/>
+<br/>
+<div class="container">
+
+    <!-- Main component for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <h1>Some default content goes in here</h1>
+        <p>This is just an example</p>
+    </div>
+
+</div> <!-- /container -->

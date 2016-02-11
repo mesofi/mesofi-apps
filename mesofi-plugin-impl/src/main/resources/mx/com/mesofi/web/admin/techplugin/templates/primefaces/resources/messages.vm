@@ -1,0 +1,51 @@
+# This file contains all the messages for the application organized by module.
+
+login.page.title=${projectName}
+
+login.form.title=Login
+login.form.field.username=Username
+login.form.field.password=Password
+login.form.button.login=Login
+
+# Some error messages.
+error.system.default=There was an unexpected error in the system.
+error.system.title=System Error.
+        
+# General labels for buttons and stuff.
+catalog.filter.msg.header=Search Criteria
+catalog.table.msg.nofound=No records found
+catalog.table.msg.loading=Loading...
+
+catalog.form.button.reset=Reset
+catalog.form.button.search=Search
+catalog.form.button.add=Add
+catalog.form.button.refresh=Refresh
+catalog.form.button.edit=Edit
+catalog.form.button.cancel=Cancel
+catalog.form.button.save=Save
+catalog.form.button.update=Update
+catalog.form.button.empty=Select an option
+
+catalog.form.title.edit=Edit Record
+catalog.form.title.new=New Record
+
+catalog.form.msg.new=A new record has been created!!
+catalog.form.msg.updated=This record has been updated successfully!!
+catalog.form.msg.title.new=New record
+catalog.form.msg.title.updated=Record updated
+
+catalog.form.validation.required=The field '?' is required
+catalog.form.validation.maxlength=The length for this field '?' is longer than <len>
+catalog.form.validation.scale=The number of fraction digits for this field '?' is longer than <scale>
+
+catalog.form.format.date=MM/dd/yyyy
+catalog.form.format.datetime=MM/dd/yyyy HH:mm:ss
+catalog.form.format.time=HH:mm:ss
+
+#foreach( ${field} in ${allFields} )
+# Labels for page ${field.pageName}.
+#foreach( ${f} in ${field.appFields} )
+catalog.${field.pageName}.field.${f.fieldLabel.replace(" ","")}=${f.fieldLabel.substring(0,1).toUpperCase()}${f.fieldLabel.substring(1)}
+#end
+
+#end

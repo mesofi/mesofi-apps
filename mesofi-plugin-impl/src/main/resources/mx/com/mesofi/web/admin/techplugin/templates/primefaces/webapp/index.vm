@@ -1,0 +1,33 @@
+#set ($classNameBeanInstance = "${classNameBean.substring(0,1).toLowerCase()}${classNameBean.substring(1)}")
+#set ($classNameModelInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title><h:outputText value="#{msg['login.page.title']}" /></title>
+        <h:outputStylesheet library="css" name="style.css" />
+    </h:head>
+    <h:body>
+        <h:form id="inputForm">
+            <p:dialog visible="true" id="dialog" header="#{msg['login.form.title']}" widgetVar="dlg" resizable="false" closable="false">
+                <p:message for="username" />
+                <p:message for="password" />
+                <h:panelGrid columns="2" cellpadding="5">
+                    <h:outputLabel for="username" value="#{msg['login.form.field.username']}:" />
+                    <p:inputText value="#{${classNameBeanInstance}.${classNameModelInstance}.username}" id="username" required="true" label="#{msg['login.form.field.username']}" />
+
+                    <h:outputLabel for="password" value="#{msg['login.form.field.password']}:" />
+                    <h:inputSecret value="#{${classNameBeanInstance}.${classNameModelInstance}.password}" id="password" required="true" label="#{msg['login.form.field.password']}" />
+
+                    <f:facet name="footer">
+                        <p:commandButton action="#{${classNameBeanInstance}.loginUsuario}" id="loginLink" value="#{msg['login.form.button.login']}" ajax="false" />
+                    </f:facet>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>

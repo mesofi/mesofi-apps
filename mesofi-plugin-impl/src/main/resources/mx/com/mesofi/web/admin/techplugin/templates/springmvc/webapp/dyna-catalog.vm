@@ -1,0 +1,135 @@
+#set ($classNameInstance = "${className.substring(0,1).toLowerCase()}${className.substring(1)}")
+#set ($classNameSearchLInstance = "${classNameSearch.substring(0,1).toLowerCase()}${classNameSearch.substring(1)}")
+#set ($classNameConfigLInstance = "${classNameConfigModel.substring(0,1).toLowerCase()}${classNameConfigModel.substring(1)}")
+#set ($classNameModelInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+#set ($classNameFormModelInstance = "${classNameFormModel.substring(0,1).toLowerCase()}${classNameFormModel.substring(1)}")
+<%@ taglib prefix="s" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<br/><br/><br/>
+<div class="container" id="body-global-container">
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#panelFilter" aria-expanded="false">
+        <s:message code="catalog.filter.msg.header" />
+    </button>
+    <p/>
+    <div class="collapse" id="panelFilter">
+        <div class="well">
+            <c:url var = "urlFilter" value = "search" />
+            <form:form id="formSearch" method="POST" action="${urlFilter}" modelAttribute="${classNameModelInstance}" >
+                <table border="0">
+#foreach( ${field} in ${fields} )
+#set ($labelCode = "catalog.${pageName}.field.${field.fieldLabel.replace(' ','')}")
+                    <tr>
+                        <td>
+                            <s:message code="${labelCode}" var="${field.fieldJavaType}LabelFilter" />
+                            <form:label for="filterSearch${velocityCount}" path="${field.fieldJavaType}">${${field.fieldJavaType}LabelFilter}</form:label>
+                        </td>
+                        <td>
+@Pointcut("view.filter.input.springmvc")
+                        </td>
+                    </tr>
+#end
+                    <tr>
+                        <td>
+                            <button type="button" id="clearBtn" class="btn btn-default" >
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <s:message code="catalog.form.button.reset" />
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" id="filterBtn" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-filter"></span>
+                                <s:message code="catalog.form.button.search" />
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </form:form>
+        </div>
+    </div>
+    <p />
+    <button type="button" id="addBtn" class="btn btn-default" data-toggle="modal" data-target="#modalDialog">
+        <span class="glyphicon glyphicon-plus"></span>
+        <s:message code="catalog.form.button.add" />
+    </button>
+    <button type="button" id="refreshBtn" class="btn btn-default" >
+        <span class="glyphicon glyphicon-refresh"></span>
+        <s:message code="catalog.form.button.refresh" />
+    </button>
+    <table id="listDataTable" class="table table-bordered table-hover table-condensed">
+        <thead>
+#foreach( ${field} in ${fields} )
+            <th><s:message code="catalog.${pageName}.field.${field.fieldLabel.replace(" ","")}" /></th>
+#end
+            <th><s:message code="catalog.form.button.edit" /></th>
+        </thead>
+        <tbody />
+    </table>
+    
+    <div class="modal fade" id="modalDialog" tabindex="-1" role="dialog">
+        <c:url var = "urlForm" value = "save-update" />
+        <form:form id="formDialog" method="POST" action="${urlForm}" modelAttribute="${classNameFormModelInstance}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Unknown</h4>
+                    </div>
+                    <div class="modal-body">
+#foreach( ${field} in ${fields} )
+#set ($labelCode = "catalog.${pageName}.field.${field.fieldLabel.replace(' ','')}")
+                        <div class="form-group">
+                            <s:message code="${labelCode}" var="${field.fieldJavaType}LabelForm" />
+                            <form:hidden id="hiddenForm${velocityCount}" path="${classNameConfigLInstance}.${field.fieldJavaType}Enabled" />
+#if (${field.optional} || ${field.autoIncrement})
+                            <form:label for="inputForm${velocityCount}" path="${classNameModelInstance}.${field.fieldJavaType}" class="control-label">${${field.fieldJavaType}LabelForm}:</form:label>
+#else
+                            <form:label for="inputForm${velocityCount}" path="${classNameModelInstance}.${field.fieldJavaType}" class="control-label">${${field.fieldJavaType}LabelForm}*:</form:label>
+#end
+@Pointcut("view.form.input.springmvc")
+                        </div>
+#end
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><s:message code="catalog.form.button.cancel" /></button>
+                        <button type="button" class="btn btn-primary" id="saveOrUpdateBtn">Unknown</button>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="hiddenFormIsNewRecord" name="isNewRecord" value="-" />
+        </form:form>
+    </div>
+</div>
+
+<!-- the following field only holds the dynatable name for every page -->
+<input type="hidden" id="dynaTable" value="dynaTable${pageName}" />
+
+<script type="text/javascript" src="<c:url value="/resources/${artifactId}/js/${pageName}.js"/>"></script>
+<script>
+    var dynaTable${pageName} = null;
+    $(document).ready(function() {
+        // creates the dynaTable instance for every page.
+        dynaTable${pageName} = $('#listDataTable').bind('dynatable:afterProcess', $.fn.afterProcessDynaTable).dynatable({
+            inputs: {
+                processingText: 'Loading <img src="<c:url value="/resources/${artifactId}/img/ajax-loader.gif"/> />'
+            },
+            writers: {
+                _rowWriter: function (rowIndex, record, columns, cellWriter) {
+                    rowIndex++;
+                    var row = '<tr>\n\
+#foreach( ${field} in ${fields} )
+#if (${field.primaryKey})
+                               <td id="pk_' + record.${field.fieldJavaType} + '">' + record.${field.fieldJavaType} + '</td>\n\
+#else
+                               <td><a href="#" id="row' + rowIndex + '">' + record.${field.fieldJavaType} + '</a></td>\n\
+#end
+#end
+                               <td><a href="#" id="recordColumnEdit" data-toggle="modal" data-target="#modalDialog"><span class="glyphicon glyphicon-pencil"></span></a></td></tr>';
+                    return row;
+                }
+            }
+        }).data('dynatable');
+        // retrieves records to show them on screen.
+        $.fn.searchRecords();
+    });
+</script>

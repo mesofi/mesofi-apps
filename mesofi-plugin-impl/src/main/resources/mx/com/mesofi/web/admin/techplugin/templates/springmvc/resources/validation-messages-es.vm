@@ -1,0 +1,4 @@
+# This file contains all the validation messages for the application organized by module.
+
+login.form.username.validation.required=El campo Nombre de Usuario no tiene un valor v\u00e1lido
+login.form.password.validation.required=El campo Contrase\u00f1a no tiene un valor v\u00e1lido

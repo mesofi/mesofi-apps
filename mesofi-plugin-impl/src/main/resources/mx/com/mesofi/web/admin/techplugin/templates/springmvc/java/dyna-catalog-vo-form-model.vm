@@ -1,0 +1,63 @@
+#set ($classNameModelLInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.${suffixPackageName};
+
+import ${packageName}.${suffixModelPackageName}.${classNameModel};
+import ${packageName}.${suffixModelPackageName}.${classNameConfigModel};
+
+/**
+ * This class wraps multiple beans to handle the request.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+public class ${classNameFormModel} {
+    
+    /**
+     * This is the original model object.
+     */
+    private ${classNameModel} ${classNameModelLInstance};
+    
+    /**
+     * This is the config model object.
+     */
+    private ${classNameConfigModel} ${classNameConfigModelLInstance};
+    
+    /**
+     * @return the ${classNameModelLInstance}
+     */
+    public ${classNameModel} get${classNameModelUInstance}() {
+        return ${classNameModelLInstance};
+    }
+    
+    /**
+     * @param ${classNameModelLInstance}
+     *            the ${classNameModelLInstance} to set
+     */
+    public void set${classNameModelUInstance}(${classNameModel} ${classNameModelLInstance}) {
+        this.${classNameModelLInstance} = ${classNameModelLInstance};
+    }
+    
+   /**
+    * @return the ${classNameConfigModelLInstance}
+    */
+   public ${classNameConfigModel} get${classNameConfigModelUInstance}() {
+       return ${classNameConfigModelLInstance};
+   }
+   
+   /**
+    * @param ${classNameConfigModelLInstance}
+    *            the ${classNameConfigModelLInstance} to set
+    */
+   public void set${classNameConfigModelUInstance}(${classNameConfigModel} ${classNameConfigModelLInstance}) {
+       this.${classNameConfigModelLInstance} = ${classNameConfigModelLInstance};
+   }
+}

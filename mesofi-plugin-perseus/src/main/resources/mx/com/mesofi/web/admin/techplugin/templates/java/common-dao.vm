@@ -1,0 +1,85 @@
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.common;
+
+import java.math.BigDecimal;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+/**
+ * This abstract class is meant to be used only for extension. Every class
+ * MUST extend from this class in order simplify the use of interaction with databases.
+ * 
+ * @author Mesofi
+ * @since $date
+ */
+public abstract class AbstractDao {
+    /**
+     * log4j.
+     */
+    private static final Logger log = Logger.getLogger(AbstractDao.class);
+
+    /**
+     * jdbcTemplate.
+     */
+    private final JdbcTemplate jdbcTemplate;
+
+    /**
+     * Constructs this object by passing the Data source.
+     * 
+     * @param dataSource
+     *            DataSource associated.
+     */
+    public AbstractDao(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    /**
+     * Gets the data source associated.
+     * 
+     * @return The data source.
+     */
+    protected JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    /**
+     * Validates the affected records. If the affected value is 0 then it throws
+     * an exception showing the message error.
+     * 
+     * @param affected
+     *            Total number of objects to be affected.
+     * @return total objects affected.
+     */
+    protected int validateAffectedRecords(int affected) {
+        if (affected == 0) {
+            if (log.isDebugEnabled()) {
+                log.debug("Records affected: " + affected);
+            }
+            throw new IllegalStateException("The performed transaction did not update any record");
+        }
+        return affected;
+    }
+    
+    /**
+     * Given a BigDecimal value, returns an Integer. If this value is null, then
+     * just returns null.
+     * 
+     * @param value
+     *            The value to be return as Integer.
+     * @return An Integer value or null when the argument is null.
+     */
+    protected Integer ensureValue(BigDecimal value) {
+        return value != null ? value.intValue() : null;
+    }
+}

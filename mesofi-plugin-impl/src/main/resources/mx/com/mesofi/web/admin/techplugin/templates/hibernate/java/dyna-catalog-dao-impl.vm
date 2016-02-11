@@ -1,0 +1,108 @@
+#set ($classNamePersistenceInstance = "${classNamePersistence.substring(0,1).toLowerCase()}${classNamePersistence.substring(1)}")
+#set ($classNameModelInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+#set ($classNameSearchInstance = "${classNameSearch.substring(0,1).toLowerCase()}${classNameSearch.substring(1)}")
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.${suffixPackageName};
+
+#foreach( ${field} in ${fields} )
+#if (${field.fieldType} == "Date")
+import java.util.Date;
+#break
+#end
+#end
+import java.util.List;
+
+import ${packageName}.${suffixModelPackageName}.${classNameModel};
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+/**
+ * Direct implementation for ${className} this class uses Hibernate
+ * Template name: [${templateName}]
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+@Repository
+public class ${className}Impl implements ${className} {
+    
+    @Autowired
+    private SessionFactory sessionFactory;
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveRecord(${classNameModel} ${classNameModelInstance}) {
+        Session session = sessionFactory.openSession();
+        session.save(${classNameModelInstance});
+        session.flush();
+        session.close();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateRecord(${classNameModel} ${classNameModelInstance}) {
+        Session session = sessionFactory.openSession();
+        session.update(${classNameModelInstance});
+        session.flush();
+        session.close();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<${classNameModel}> getData() {
+        List<${classNameModel}> data = null;
+        Session session = sessionFactory.openSession();
+        Query query = session.createQuery("from ${classNameModel}");
+        data = query.list();
+        session.close();
+        return data;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<${classNameModel}> getData(${classNameModel} ${classNameSearchInstance}) {
+        List<${classNameModel}> data = null;
+        Session session = sessionFactory.openSession();
+        Criteria criteria = session.createCriteria(${classNameModel}.class);
+#foreach( ${field} in ${fields} )
+#set ($fieldJavaType = "${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}")
+#if( ${field.primaryKey} )
+        if (${classNameSearchInstance}.get${fieldJavaType}() != null) {
+            criteria.add(Restrictions.eq("${field.fieldJavaType}", ${classNameSearchInstance}.get${fieldJavaType}()));
+        }
+#else
+        if (${classNameSearchInstance}.get${fieldJavaType}() != null) {
+            criteria.add(Restrictions.like("${field.fieldJavaType}", ${classNameSearchInstance}.get${fieldJavaType}(), MatchMode.ANYWHERE));
+        }        
+#end
+#end
+        data = criteria.list();
+        
+        session.close();
+        return data;
+    }
+}

@@ -1,0 +1,187 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>$groupId</groupId>
+    <artifactId>$artifactId</artifactId>
+    <version>$version</version>
+    <packaging>war</packaging>
+    
+    <properties>
+        <project.build.source.encoding>$projectBuildSourceEncoding</project.build.source.encoding>
+        <organization.url>$organizationUrl</organization.url>
+        <organization.name>$organizationName</organization.name>
+        <java.compiler.version>$javaVersion</java.compiler.version>
+        <context.path>$artifactId</context.path>
+        
+        <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+        <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
+        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>2.7</maven-javadoc-plugin.version>
+        <maven-war-plugin.version>2.0.2</maven-war-plugin.version>
+        
+        <junit.version>4.6</junit.version>
+        <log4j.version>1.2.12</log4j.version>
+        <commons-dbcp.version>1.4</commons-dbcp.version>
+        <jstl.version>1.2</jstl.version>
+        <servlet.version>2.5</servlet.version>
+        <el-api.version>1.0</el-api.version>
+        <commons-lang.version>2.5</commons-lang.version>
+        
+#foreach( $dependencyProp in $!allDependencyProperties )
+        $dependencyProp
+#end
+    </properties>
+    
+    <organization>
+        <name>${organization.name}</name>
+        <url>${organization.url}</url>
+    </organization>
+    
+    <name>${project.artifactId}</name>
+    <url>${organization.url}</url>
+    
+    <developers>
+        <developer>
+            <name>$developerName</name>
+            <email>$developerEmail</email>
+            <organization>${organization.name}</organization>
+            <organizationUrl>${organization.url}</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+    
+    <repositories>
+#foreach( $repository in $allRepositories )
+        <repository>
+            <id>$repository.id</id>
+            <name>$repository.name</name>
+            <url>$repository.url</url>
+        </repository>
+#end
+    </repositories>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>#[[${junit.version}]]#</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <!-- This library is meant to use only for local environments, for others 
+        environments, this dependency should be removed -->
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>${commons-dbcp.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>${jstl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>${servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+            <version>${el-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons-lang.version}</version>
+        </dependency>
+
+#set($openCurlyBracket = "${")
+#set($closeCurlyBracket = "}")
+#foreach( $dependency in $allDependencies )
+#foreach( $comment in $!dependency.comments )
+        <!-- $comment -->
+#end
+        <dependency>
+            <groupId>$dependency.groupId</groupId>
+            <artifactId>$dependency.artifactId</artifactId>
+            <version>$openCurlyBracket$dependency.versionFake$closeCurlyBracket</version>
+        </dependency>
+
+#end
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Plugin for filtering -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <configuration>
+                    <!-- specify UTF-8, ISO-8859-1 or any other file encoding -->
+                    <encoding>${project.build.source.encoding}</encoding>
+                </configuration>
+            </plugin>
+            <!-- plugin for the compiler version -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${java.compiler.version}</source>
+                    <target>${java.compiler.version}</target>
+                </configuration>
+            </plugin>
+            <!-- plugin to attach the source to the resulting component -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- plugin to include the jetty server -->
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>8.1.9.v20130131</version>
+                <configuration>
+                    <stopKey>STOP</stopKey>
+                    <stopPort>9999</stopPort>
+                    <scanIntervalSeconds>5</scanIntervalSeconds>
+                    <connectors>
+                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+                            <port>9090</port>
+                        </connector>
+                    </connectors>
+                </configuration>
+            </plugin>            
+        </plugins>
+        <finalName>${context.path}</finalName>
+    </build>
+    <!-- TODO Improvement, create profiles for this pom. -->
+
+</project>

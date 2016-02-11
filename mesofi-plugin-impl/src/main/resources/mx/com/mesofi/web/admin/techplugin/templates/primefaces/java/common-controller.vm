@@ -1,0 +1,109 @@
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName}.common;
+
+import java.util.ResourceBundle;
+
+import javax.el.ExpressionFactory;
+import javax.el.ValueExpression;
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.FacesContext;
+
+import org.apache.log4j.Logger;
+
+/**
+ * This abstract class is meant to be used only for extension. Every class
+ * MUST extend from this class in order simplify the use of the controller.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+public abstract class AbstractController {
+    /**
+     * log4j.
+     */
+    private static final Logger log = Logger.getLogger(AbstractController.class);
+    
+    protected FacesContext getCurrentContext() {
+        return FacesContext.getCurrentInstance();
+    }
+    
+    protected void addErrorValidation(boolean isInline, String fieldName, String message) {
+        if (isInline) {
+            addError(getMessage(fieldName, message), false);
+        } else {
+            addError(getMessage(fieldName, message), "formDialog:messages");
+        }
+    }
+    
+    protected void addError(String msg, boolean showDetail) {
+        if (showDetail) {
+            addMessage(msg, FacesMessage.SEVERITY_ERROR);
+        } else {
+            addFullMessage(msg, "", FacesMessage.SEVERITY_ERROR);
+        }
+    }
+    
+    protected void addError(String msg, String idComponente) {
+        addMessage(msg, idComponente, FacesMessage.SEVERITY_ERROR);
+    }
+    
+    protected void addInfo(String title, String msg) {
+        addFullMessage(title, msg, FacesMessage.SEVERITY_INFO);
+    }
+    
+    private Object getExpression(String expression) {
+        FacesContext ctx = getCurrentContext();
+        ExpressionFactory factory = ctx.getApplication().getExpressionFactory();
+        ValueExpression ex = factory.createValueExpression(ctx.getELContext(), "#{" + expression + "}", Object.class);
+        return ex.getValue(ctx.getELContext());
+
+    }
+    
+    private void addFullMessage(String title, String msg, Severity severity) {
+        FacesMessage message = new FacesMessage(title, msg);
+        message.setSeverity(severity);
+        FacesContext ctx = getCurrentContext();
+        ctx.addMessage(null, message);
+    }
+    
+    private void addMessage(String msg, String idComponente, Severity severity) {
+        FacesMessage message = new FacesMessage(msg);
+        message.setSeverity(severity);
+        FacesContext ctx = getCurrentContext();
+        ctx.addMessage(idComponente, message);
+    }
+    
+    private String getMessage(String fieldName, String reqMsg) {
+        return reqMsg.replaceAll("\\?", fieldName);
+    }
+    
+    private void addMessage(String msg, Severity severity) {
+        FacesMessage message = new FacesMessage(msg);
+        message.setSeverity(severity);
+        FacesContext ctx = getCurrentContext();
+        ctx.addMessage(null, message);
+    }
+    
+    public void addErrorSystem(String msgDetail) {
+        msgDetail = msgDetail == null ? "" : msgDetail;
+        if (msgDetail.isEmpty()) {
+            msgDetail = getMessage("error.system.default");
+        }
+        addFullMessage(getMessage("error.system.title"), msgDetail, FacesMessage.SEVERITY_FATAL);
+    }
+    
+    protected String getMessage(String key) {
+        FacesContext ctx = getCurrentContext();
+        ResourceBundle bundle = ctx.getApplication().getResourceBundle(ctx, "msg");
+        return bundle.getString(key);
+    }
+}

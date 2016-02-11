@@ -1,0 +1,44 @@
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+
+package ${packageName}.${suffixPackageName};
+
+import java.io.Serializable;
+
+/**
+ * This class will hold properties for the menu.
+ * @author Mesofi
+ * @since ${date}
+ */
+public class DefaultMenuItem implements Serializable {
+
+    private String url;
+    private String description;
+
+    public DefaultMenuItem(String description) {
+        this.description = description;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" 
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- The following properties are defined as part of spring configuration -->
+        <!--
+        <property name="hibernate.connection.username">${dbUserName}</property>
+        <property name="hibernate.connection.password">${dbPassword}</property>
+        <property name="hibernate.connection.url">${dbUrl}</property>
+        <property name="hibernate.connection.driver_class">${dbDriver}</property>
+        -->
+        <property name="hibernate.dialect">${dbSqlDialect}</property>
+        <property name="hibernate.show_sql">true</property>
+        
+#if (${annotatedEntity})
+        <!-- mapping classes -->
+#foreach( ${mapping} in ${mappingClasses} )
+        <mapping class="${mapping}"/>
+#end
+#else
+        <!-- mapping files -->
+#foreach( ${mapping} in ${mappingResources} )
+        <mapping resource="${mapping}"/>
+#end
+#end
+    </session-factory>
+    
+</hibernate-configuration>

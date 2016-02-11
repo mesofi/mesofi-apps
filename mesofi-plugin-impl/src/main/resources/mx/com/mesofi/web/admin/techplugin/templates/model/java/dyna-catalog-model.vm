@@ -1,0 +1,79 @@
+/*
+ * COPYRIGHT. Mesofi ${year}. ALL RIGHTS RESERVED.
+ *
+ * This software is only to be used for the purpose for which it has been
+ * provided. No part of it is to be reproduced, disassembled, transmitted,
+ * stored in a retrieval system nor translated in any human or computer
+ * language in any way or for any other purposes whatsoever without the
+ * prior written consent of Mesofi.
+ */
+package ${packageName};
+
+import java.io.Serializable;
+#foreach( ${field} in ${fields} )
+#if (${field.fieldType} == "Date")
+import java.util.Date;
+#break
+#end
+#end
+#if (${annotatedEntity})
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+#end
+
+/**
+ * Contains all fields for a particular module.
+ * 
+ * @author Mesofi
+ * @since ${date}
+ */
+#if (${annotatedEntity})
+@Entity
+@Table(name = "${tableName}")
+#end
+public class ${className} implements Serializable {
+#foreach( ${field} in ${fields} )
+#if (${field.fieldType} == "Boolean" && ${field.size} > 1)
+    private byte[] ${field.fieldJavaType};
+#else
+#if (${annotatedEntity} && ${field.primaryKey})
+    @Id
+    @GeneratedValue
+#end
+#if (${annotatedEntity})
+    @Column(name = "${field.fieldName}")
+#end
+    private ${field.fieldType} ${field.fieldJavaType};
+#end
+#end
+
+#foreach( ${field} in ${fields} )    
+    /**
+     * @return the ${field.fieldJavaType}
+     */
+#if (${field.fieldType} == "Boolean" && ${field.size} > 1)
+    public byte[] get${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}() {
+#else
+    public ${field.fieldType} get${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}() {
+#end
+        return ${field.fieldJavaType};
+    }
+    
+    /**
+     * @param ${field.fieldJavaType}
+     *            the ${field.fieldJavaType} to set
+     */
+#if (${field.fieldType} == "Boolean" && ${field.size} > 1)
+    public void set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}(byte[] ${field.fieldJavaType}) {
+#else
+    public void set${field.fieldJavaType.substring(0,1).toUpperCase()}${field.fieldJavaType.substring(1)}(${field.fieldType} ${field.fieldJavaType}) {
+#end
+        this.${field.fieldJavaType} = ${field.fieldJavaType};
+    }
+    
+#end
+}

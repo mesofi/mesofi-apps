@@ -1,0 +1,151 @@
+#set ($classNameInstance = "${className.substring(0,1).toLowerCase()}${className.substring(1)}")
+#set ($classNameSearchLInstance = "${classNameSearch.substring(0,1).toLowerCase()}${classNameSearch.substring(1)}")
+#set ($classNameConfigLInstance = "${classNameConfigModel.substring(0,1).toLowerCase()}${classNameConfigModel.substring(1)}")
+#set ($classNameModelInstance = "${classNameModel.substring(0,1).toLowerCase()}${classNameModel.substring(1)}")
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    template="/templates/template.xhtml">
+    <ui:define name="metadata" />
+    <ui:define name="content">
+        <p:fieldset legend="#{msg['catalog.filter.msg.header']}" toggleable="true" id="panelFilter" rendered="#{cnf['ui.${pageName}.filter.visible']}" >
+            <h:form id="formSearch">
+                <p:messages id="messagesSearch" closable="true" />
+                <p:panelGrid id="panelFilterFields">
+#foreach( ${field} in ${fields} )
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="filterSearch${velocityCount}" value="#{msg['catalog.${pageName}.field.${field.fieldLabel.replace(" ","")}']}" />
+                        </p:column>
+                        <p:column>
+@Pointcut("view.filter.input.primefaces")
+                            <p:watermark for="filterSearch${velocityCount}" value="#{msg['catalog.${pageName}.field.${field.fieldLabel.replace(" ","")}']}" />
+                        </p:column>
+                    </p:row>
+#end
+                    <p:row>
+                        <p:column />
+                        <p:column>
+                            <p:commandButton value="#{msg['catalog.form.button.reset']}"
+                                icon="ui-icon-trash" id="clearBtn"
+                                update=":formTable:listDataTable, :formSearch"
+                                actionListener="#{${classNameInstance}.clearSearchRecords}" />
+                            <p:spacer width="7" height="10" />
+                            <p:commandButton id="filterBtn" value="#{msg['catalog.form.button.search']}"
+                                icon="ui-icon-search" update=":formTable:listDataTable, :formSearch"
+                                actionListener="#{${classNameInstance}.searchRecords}" />
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+                <p:defaultCommand target="filterBtn" />
+                <p:blockUI block="panelFilterFields" trigger="filterBtn" />
+            </h:form>
+        </p:fieldset>
+        <br/>
+        <h:form id="formTable">
+            <p:dataTable id="listDataTable" 
+                emptyMessage="#{msg['catalog.table.msg.nofound']}"
+                var="record"
+                value="#{${classNameInstance}.data}"
+                paginator="true"
+                paginatorPosition="bottom" 
+                paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" 
+                paginatorAlwaysVisible="true"
+                rowsPerPageTemplate="5, 10, 25, 50"
+                rows="5" 
+                editable="true" 
+                editMode="cell"
+                rendered="#{cnf['ui.${pageName}.datatable.visible']}">
+                
+                <f:facet name="header">
+                    <div style="text-align: left">
+                        <p:commandButton value="#{msg['catalog.form.button.add']}" icon="ui-icon-plus" 
+                            actionListener="#{${classNameInstance}.addRecord}" update=":modalDialog"
+                            oncomplete="PF('dlg').show()" />
+                        <p:commandButton value="#{msg['catalog.form.button.refresh']}" icon="ui-icon-refresh" 
+                            actionListener="#{${classNameInstance}.searchRecords}" update=":formTable:listDataTable" />
+                    </div>
+                </f:facet>
+                
+                <p:ajax event="cellEdit" listener="#{${classNameInstance}.onCellEdit}" update=":growl" />
+#foreach( ${field} in ${fields} )
+                <p:column id="recordColumn${velocityCount}" headerText="#{msg['catalog.${pageName}.field.${field.fieldLabel.replace(" ","")}']}" styleClass="ui-widget-data-table-column" rendered="#{cnf['ui.${pageName}.column.visible.${field.fieldLabel.replace(" ","")}']}">
+#if (${field.primaryKey})
+                    <h:outputText value="#{record.${field.fieldJavaType}}" />
+#else
+                    <p:cellEditor>
+                        <f:facet name="output">
+@Pointcut("view.table.output")
+                        </f:facet>
+                        <f:facet name="input">
+@Pointcut("view.table.input")
+                        </f:facet>
+                    </p:cellEditor>
+#end
+                </p:column>
+#end
+                <p:column id="recordColumnEdit" headerText="#{msg['catalog.form.button.edit']}" styleClass="ui-widget-data-table-column">
+                    <p:commandLink id="selectButton" update=":modalDialog" oncomplete="PF('dlg').show()" 
+                        title="#{msg['catalog.form.button.edit']}"
+                        actionListener="#{${classNameInstance}.editRecord(record)}">
+                        <h:outputText styleClass="ui-icon ui-icon-pencil" style="margin:0 auto;" />
+                    </p:commandLink>
+                </p:column>
+            </p:dataTable>
+            <p:blockUI block="listDataTable" trigger="listDataTable">
+                #{msg['catalog.table.msg.loading']}<br />
+            </p:blockUI>
+        </h:form>
+        
+        <p:dialog id="modalDialog" header="#{${classNameInstance}.formTitle}" widgetVar="dlg" modal="true" appendTo="@(body)" closable="true" resizable="false" closeOnEscape="true">
+            <h:form id="formDialog">
+                <p:panelGrid id="panelSaveOrUpdate">
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:messages id="messagesForm" autoUpdate="true" showDetail="false" globalOnly="false" closable="true" />
+                        </p:column>
+                    </p:row>
+#foreach( ${field} in ${fields} )
+                    <p:row>
+                        <p:column>
+#if (${field.optional} || ${field.autoIncrement})
+                            <p:outputLabel for="inputForm${velocityCount}" value="#{msg['catalog.${pageName}.field.${field.fieldLabel.replace(" ","")}']}:" styleClass="#{${classNameInstance}.${classNameConfigLInstance}.${field.fieldJavaType}Style}"/>
+#else
+                            <p:outputLabel for="inputForm${velocityCount}" value="#{msg['catalog.${pageName}.field.${field.fieldLabel.replace(" ","")}']}*:" styleClass="#{${classNameInstance}.${classNameConfigLInstance}.${field.fieldJavaType}Style}"/>
+#end
+                        </p:column>
+                        <p:column>
+@Pointcut("view.form.input.primefaces")                            
+                            <p:watermark for="inputForm${velocityCount}" value="#{msg['catalog.${pageName}.field.${field.fieldLabel.replace(" ","")}']}" />                            
+                        </p:column>
+                    </p:row>
+#end
+                    <p:row>
+                        <p:column colspan="2">
+                            <hr />
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:commandButton value="#{msg['catalog.form.button.cancel']}" actionListener="#{${classNameInstance}.cancelRecord}" icon="ui-icon-cancel" oncomplete="PF('dlg').hide();" />
+                            <p:spacer width="7" height="10" />
+                            <p:commandButton value="#{${classNameInstance}.saveOrUpdate}"
+                                id="saveOrUpdateBtn" actionListener="#{${classNameInstance}.saveOrUpdateRecord}"
+                                partialSubmit="true"
+                                update=":growl, :formTable:listDataTable, :formDialog"
+                                validateClient="true" 
+                                icon="ui-icon-disk"
+                                global="true" />
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+                <p:defaultCommand target="saveOrUpdateBtn" />
+            </h:form>
+        </p:dialog>
+        
+        <p:growl id="growl" showDetail="true" life="5000" globalOnly="true" />
+    </ui:define>
+</ui:composition>
