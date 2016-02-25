@@ -32,6 +32,9 @@ public abstract class ProjectFile {
      * @return The full name.
      */
     public String getFullName() {
+        if (FileType.NO_EXTENSION.toString().equals(type.toString())) {
+            return fileName;
+        }
         return fileName + "." + type.toString();
     }
 
