@@ -39,8 +39,7 @@ CREATE TABLE IF NOT EXISTS `sample_table_one` (
 
 CREATE TABLE IF NOT EXISTS `sample_table_two` (
 `id` int(11) NOT NULL,
-  `description` varchar(500) NOT NULL,
-  `age` int(11) NOT NULL
+  `description` varchar(500) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
