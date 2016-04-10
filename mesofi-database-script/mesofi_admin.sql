@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Apr 10, 2016 at 08:35 PM
+-- Generation Time: Apr 10, 2016 at 09:05 PM
 -- Server version: 5.6.21
 -- PHP Version: 5.5.31
 
@@ -19,62 +19,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `mesofi`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `MSF_ADMIN_ATEST1`
---
-
-CREATE TABLE IF NOT EXISTS `MSF_ADMIN_ATEST1` (
-`int_column1` int(11) NOT NULL,
-  `description` varchar(250) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `MSF_ADMIN_ATEST1`
---
-
-INSERT INTO `MSF_ADMIN_ATEST1` (`int_column1`, `description`) VALUES
-(4, 'firstssTest'),
-(5, 'second'),
-(14, 'last'),
-(15, 'sd ggg'),
-(16, 'aaa'),
-(17, 'ds'),
-(18, 'mn'),
-(19, 'mn,..'),
-(20, 'yyy'),
-(21, 'xccx'),
-(22, 'aa'),
-(23, 'sss'),
-(24, 'dsds'),
-(25, 'asas'),
-(26, ''),
-(27, ''),
-(28, ''),
-(29, ''),
-(30, ''),
-(31, ''),
-(32, 'firstsstetes ggg');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `MSF_ADMIN_ATEST2`
---
-
-CREATE TABLE IF NOT EXISTS `MSF_ADMIN_ATEST2` (
-  `ID_COLUMN` int(11) NOT NULL,
-  `Some_more` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `MSF_ADMIN_ATEST2`
---
-
-INSERT INTO `MSF_ADMIN_ATEST2` (`ID_COLUMN`, `Some_more`) VALUES
-(1, 'Test');
 
 -- --------------------------------------------------------
 
@@ -565,18 +509,6 @@ INSERT INTO `MSF_USERS` (`ID`, `EMAIL`, `PASSWORD`) VALUES
 --
 
 --
--- Indexes for table `MSF_ADMIN_ATEST1`
---
-ALTER TABLE `MSF_ADMIN_ATEST1`
- ADD PRIMARY KEY (`int_column1`);
-
---
--- Indexes for table `MSF_ADMIN_ATEST2`
---
-ALTER TABLE `MSF_ADMIN_ATEST2`
- ADD PRIMARY KEY (`ID_COLUMN`);
-
---
 -- Indexes for table `MSF_ADMIN_COLUMNS`
 --
 ALTER TABLE `MSF_ADMIN_COLUMNS`
@@ -688,11 +620,6 @@ ALTER TABLE `MSF_USERS`
 -- AUTO_INCREMENT for dumped tables
 --
 
---
--- AUTO_INCREMENT for table `MSF_ADMIN_ATEST1`
---
-ALTER TABLE `MSF_ADMIN_ATEST1`
-MODIFY `int_column1` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=33;
 --
 -- AUTO_INCREMENT for table `MSF_ADMIN_COLUMNS`
 --
