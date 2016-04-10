@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `MSF_ADMIN_TABLES` (
   `DATABASE_SCHEMA` varchar(150) NOT NULL,
   `TABLE_NAME` varchar(200) NOT NULL COMMENT 'Table Name',
   `IS_TABLE_NAME_PROCESSED` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'This column controls whether this table will be part of the process or not'
-) ENGINE=InnoDB AUTO_INCREMENT=164 DEFAULT CHARSET=latin1 COMMENT='Stores the table details to be processed';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1 COMMENT='Stores the table details to be processed';
 
 -- --------------------------------------------------------
 
@@ -649,7 +649,7 @@ MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 -- AUTO_INCREMENT for table `MSF_ADMIN_TABLES`
 --
 ALTER TABLE `MSF_ADMIN_TABLES`
-MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=164;
+MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `MSF_ALL_CODE_TYPE`
 --
