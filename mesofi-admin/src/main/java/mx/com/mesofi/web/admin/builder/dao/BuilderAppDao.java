@@ -32,7 +32,7 @@ public interface BuilderAppDao {
 
     List<BuilderAppVo> getTableConfig();
 
-    List<BuilderAppConfigVo> getBuilderAppConfig();
+    List<BuilderAppConfigVo> getBuilderAppConfig(Integer connId);
 
     List<BuilderAppVo> getTableConfig(Integer connId);
 

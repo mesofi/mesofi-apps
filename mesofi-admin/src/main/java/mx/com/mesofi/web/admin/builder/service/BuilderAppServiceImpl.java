@@ -294,7 +294,7 @@ public class BuilderAppServiceImpl implements BuilderAppService {
                 throw new ValidationBusinessException("Cannot build an application since there is not plugin selected");
             }
             // gets all the information stored to create the application.
-            List<BuilderAppConfigVo> dataConfig = builderAppDao.getBuilderAppConfig();
+            List<BuilderAppConfigVo> dataConfig = builderAppDao.getBuilderAppConfig(builderAppCompoundVo.getConnId());
             if (dataConfig.isEmpty()) {
                 throw new ValidationBusinessException(
                         "Please add tables into the configuration, cannot create application without them");

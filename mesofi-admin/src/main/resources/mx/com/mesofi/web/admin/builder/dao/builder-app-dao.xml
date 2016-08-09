@@ -45,7 +45,7 @@
 				SELECT ID, TABLE_NAME FROM MSF_ADMIN_TABLES
 			]]>
 		</prop>
-		<prop key="select.all.configuration.detail">
+		<prop key="select.all.configuration.detail.by.conn-id">
 			<![CDATA[
 				SELECT CC.CONN_NAME, T.TABLE_NAME, C.COLUMN_NAME, CT.DATABASE_TYPE, C.PERMITTED_VALUES, C.SIZE, C.SCALE, C.NULLABLE, C.PRIMARY_KEY, C.AUTO_INCREMENT, CT.ID_SQL_TYPE, CT.JAVA_TYPE 
 				FROM MSF_ADMIN_TABLES T, MSF_ADMIN_COLUMNS C, MSF_ADMIN_CONNECTIONS CC, MSF_ADMIN_COLUMN_TYPES CT 
@@ -53,6 +53,7 @@
 				AND T.ID_CONNECTION = CC.ID 
 				AND C.ID_COLUMN_TYPE = CT.ID
 				AND T.IS_TABLE_NAME_PROCESSED = 1
+				AND CC.ID = ? -- connection id.
 			]]>
 		</prop>
 		<prop key="select.all.configuration.detail.by.conn">
