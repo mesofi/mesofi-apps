@@ -173,7 +173,6 @@ public class BuilderAppDaoImpl extends JdbcAbstractDao implements BuilderAppDao 
     public List<BuilderAppConfigVo> getBuilderAppConfig(Integer connId) {
         List<BuilderAppConfigVo> list = new ArrayList<BuilderAppConfigVo>();
         String sql = builderAppDao.getProperty("select.all.configuration.detail.by.conn-id");
-        sql = null;
         list = query(sql, new JdbcRowMapper<BuilderAppConfigVo>() {
             @Override
             public BuilderAppConfigVo mapRow(ResultSet rs, int n) throws SQLException {
